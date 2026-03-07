@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -108,4 +109,39 @@ func TestStore_SaveLocation_UpsertVehicle(t *testing.T) {
 	err = store.pool.QueryRow(ctx, "SELECT COUNT(*) FROM location_points WHERE vehicle_id = $1", "test-bus-2").Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 2, count)
+}
+
+func TestStore_GetRecentLocations(t *testing.T) {
+	url := testDatabaseURL(t)
+	ctx := context.Background()
+
+	store, err := NewStore(ctx, url)
+	require.NoError(t, err)
+	defer store.Close()
+
+	// Clean up
+	store.pool.Exec(ctx, "DELETE FROM location_points")
+	store.pool.Exec(ctx, "DELETE FROM vehicles")
+
+	now := time.Now()
+
+	// Insert an old location that should be filtered out
+	store.pool.Exec(ctx, "INSERT INTO vehicles (id) VALUES ('bus-stale')")
+	store.pool.Exec(ctx, "INSERT INTO location_points (vehicle_id, trip_id, latitude, longitude, timestamp, received_at) VALUES ('bus-stale', '', 1, 1, 1, $1)", now.Add(-10*time.Minute))
+
+	// Insert a recent location that should be included
+	store.pool.Exec(ctx, "INSERT INTO vehicles (id) VALUES ('bus-fresh')")
+	store.pool.Exec(ctx, "INSERT INTO location_points (vehicle_id, trip_id, latitude, longitude, timestamp, received_at) VALUES ('bus-fresh', 'route-1', 2, 2, 2, $1)", now)
+
+	// Insert an even more recent location for the same vehicle to test DISTINCT ON
+	store.pool.Exec(ctx, "INSERT INTO location_points (vehicle_id, trip_id, latitude, longitude, timestamp, received_at) VALUES ('bus-fresh', 'route-1', 3, 3, 3, $1)", now.Add(1*time.Minute))
+
+	// Query with a 5-minute staleness threshold
+	cutoff := now.Add(-5 * time.Minute)
+	locs, err := store.GetRecentLocations(ctx, cutoff)
+	require.NoError(t, err)
+
+	require.Len(t, locs, 1, "should only return 1 active vehicle")
+	assert.Equal(t, "bus-fresh", locs[0].VehicleID)
+	assert.Equal(t, float64(3), locs[0].Latitude, "should return the most recent point for the vehicle")
 }

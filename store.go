@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -85,6 +86,49 @@ func (s *Store) SaveLocation(ctx context.Context, loc *LocationReport) error {
 		return fmt.Errorf("commit tx: %w", err)
 	}
 	return nil
+}
+
+// GetRecentLocations retrieves the latest position for each vehicle since the cutoff time.
+func (s *Store) GetRecentLocations(ctx context.Context, cutoff time.Time) ([]*LocationReport, error) {
+	query := `
+		SELECT DISTINCT ON (vehicle_id) vehicle_id, trip_id, latitude, longitude, bearing, speed, accuracy, timestamp
+		FROM location_points
+		WHERE received_at > $1
+		ORDER BY vehicle_id, received_at DESC
+	`
+	rows, err := s.pool.Query(ctx, query, cutoff)
+	if err != nil {
+		return nil, fmt.Errorf("query recent locations: %w", err)
+	}
+	defer rows.Close()
+
+	var locations []*LocationReport
+	for rows.Next() {
+		var loc LocationReport
+		var bearing, speed, accuracy *float64
+
+		if err := rows.Scan(&loc.VehicleID, &loc.TripID, &loc.Latitude, &loc.Longitude, &bearing, &speed, &accuracy, &loc.Timestamp); err != nil {
+			return nil, fmt.Errorf("scan location: %w", err)
+		}
+
+		if bearing != nil {
+			loc.Bearing = *bearing
+		}
+		if speed != nil {
+			loc.Speed = *speed
+		}
+		if accuracy != nil {
+			loc.Accuracy = *accuracy
+		}
+
+		locations = append(locations, &loc)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration: %w", err)
+	}
+
+	return locations, nil
 }
 
 // Close shuts down the connection pool.

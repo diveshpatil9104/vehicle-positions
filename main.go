@@ -30,6 +30,17 @@ func main() {
 
 	tracker := NewTracker(maxAge)
 
+	cutoff := time.Now().Add(-maxAge)
+	recentLocations, err := store.GetRecentLocations(ctx, cutoff)
+	if err != nil {
+		log.Printf("warning: failed to seed tracker from database: %v", err)
+	} else {
+		for _, loc := range recentLocations {
+			tracker.Update(loc)
+		}
+		log.Printf("seeded tracker with %d active vehicles", len(recentLocations))
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/v1/locations", handlePostLocation(store, tracker))
 	mux.HandleFunc("GET /gtfs-rt/vehicle-positions", handleGetFeed(tracker))
