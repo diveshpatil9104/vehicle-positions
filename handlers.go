@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -40,7 +41,11 @@ func (r *LocationReport) validate() error {
 	return nil
 }
 
-func handlePostLocation(store *Store, tracker *Tracker) http.HandlerFunc {
+type LocationSaver interface {
+	SaveLocation(ctx context.Context, loc *LocationReport) error
+}
+
+func handlePostLocation(store LocationSaver, tracker *Tracker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1MB
 

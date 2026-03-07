@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -204,4 +206,59 @@ func TestHandlePostLocation_Validation(t *testing.T) {
 			assert.Contains(t, resp["error"], tc.want)
 		})
 	}
+}
+
+type mockStore struct {
+	err   error
+	saved bool
+}
+
+func (m *mockStore) SaveLocation(ctx context.Context, loc *LocationReport) error {
+	if m.err != nil {
+		return m.err
+	}
+	m.saved = true
+	return nil
+}
+
+func TestHandlePostLocation_HappyPath(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	mStore := &mockStore{}
+	handler := handlePostLocation(mStore, tracker)
+
+	loc := LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 100}
+	w := postLocation(handler, loc)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.True(t, mStore.saved, "location should be saved to store")
+	assert.Len(t, tracker.ActiveVehicles(), 1, "tracker should be updated")
+}
+
+func TestHandlePostLocation_StoreFailure(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	mStore := &mockStore{err: fmt.Errorf("database down")}
+	handler := handlePostLocation(mStore, tracker)
+
+	loc := LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 100}
+	w := postLocation(handler, loc)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Len(t, tracker.ActiveVehicles(), 0, "tracker should NOT be updated on DB failure")
+}
+
+func TestHandlePostLocation_InvalidJSON(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	handler := handlePostLocation(nil, tracker)
+
+	req := httptest.NewRequest("POST", "/api/v1/locations", bytes.NewReader([]byte("{bad json")))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	handler(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	var resp map[string]string
+	err := json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+	assert.Contains(t, resp["error"], "invalid JSON")
 }
