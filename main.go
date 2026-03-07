@@ -34,6 +34,7 @@ func main() {
 	defer store.Close()
 
 	tracker := NewTracker(maxAge)
+	defer tracker.Stop()
 
 	cutoff := time.Now().Add(-maxAge)
 	recentLocations, err := store.GetRecentLocations(ctx, cutoff)
