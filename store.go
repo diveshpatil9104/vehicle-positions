@@ -4,14 +4,13 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"time"
 	"log"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 //go:embed migrations/*.sql
@@ -48,7 +47,7 @@ func (s *Store) Migrate(databaseURL string) error {
 		return fmt.Errorf("migration instance error: %w", err)
 	}
 
-	// Add this defer to close the migration connection
+	// Close migration source and database connection when done.
 	defer func() {
 		srcErr, dbErr := m.Close()
 		if srcErr != nil {
