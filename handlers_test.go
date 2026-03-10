@@ -26,6 +26,16 @@ func postLocation(handler http.HandlerFunc, loc LocationReport) *httptest.Respon
 	return w
 }
 
+func postLocationWithBody(handler http.HandlerFunc, body []byte, contentType string) *httptest.ResponseRecorder {
+	req := httptest.NewRequest("POST", "/api/v1/locations", bytes.NewReader(body))
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
+	}
+	w := httptest.NewRecorder()
+	handler(w, req)
+	return w
+}
+
 func getFeed(handler http.HandlerFunc, query string) *httptest.ResponseRecorder {
 	url := "/gtfs-rt/vehicle-positions"
 	if query != "" {
@@ -266,4 +276,24 @@ func TestHandlePostLocation_InvalidJSON(t *testing.T) {
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
 	assert.Contains(t, resp["error"], "invalid JSON")
+}
+
+func TestHandlePostLocation_UnknownFieldRejected(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	handler := handlePostLocation(nil, tracker)
+
+	body := []byte(`{"vehicle_id":"bus-1","latitude":1,"longitude":2,"timestamp":100,"extra":"x"}`)
+	w := postLocationWithBody(handler, body, "application/json")
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestHandlePostLocation_TrailingJSONRejected(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	handler := handlePostLocation(nil, tracker)
+
+	body := []byte(`{"vehicle_id":"bus-1","latitude":1,"longitude":2,"timestamp":100}{"x":1}`)
+	w := postLocationWithBody(handler, body, "application/json")
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }

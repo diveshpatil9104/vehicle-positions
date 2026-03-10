@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -53,8 +54,14 @@ func handlePostLocation(store LocationSaver, tracker *Tracker) http.HandlerFunc 
 		r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1MB
 
 		var loc LocationReport
-		if err := json.NewDecoder(r.Body).Decode(&loc); err != nil {
+		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
+		if err := decoder.Decode(&loc); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON: " + err.Error()})
+			return
+		}
+		if err := decoder.Decode(&struct{}{}); err != io.EOF {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON: request body must contain a single JSON object"})
 			return
 		}
 
