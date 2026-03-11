@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 
 func TestTracker_Update(t *testing.T) {
 	tracker := NewTracker(5 * time.Minute)
+	defer tracker.Stop()
 
 	loc := &LocationReport{
 		VehicleID: "bus-1",
@@ -36,6 +38,7 @@ func TestTracker_Update(t *testing.T) {
 
 func TestTracker_UpdateOverwrites(t *testing.T) {
 	tracker := NewTracker(5 * time.Minute)
+	defer tracker.Stop()
 
 	tracker.Update(&LocationReport{VehicleID: "bus-1", Latitude: 1.0, Longitude: 2.0, Timestamp: 1})
 	tracker.Update(&LocationReport{VehicleID: "bus-1", Latitude: 3.0, Longitude: 4.0, Timestamp: 2})
@@ -48,6 +51,7 @@ func TestTracker_UpdateOverwrites(t *testing.T) {
 
 func TestTracker_MultipleVehicles(t *testing.T) {
 	tracker := NewTracker(5 * time.Minute)
+	defer tracker.Stop()
 
 	tracker.Update(&LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 1})
 	tracker.Update(&LocationReport{VehicleID: "bus-2", Latitude: 3, Longitude: 4, Timestamp: 2})
@@ -58,6 +62,7 @@ func TestTracker_MultipleVehicles(t *testing.T) {
 
 func TestTracker_Staleness(t *testing.T) {
 	tracker := NewTracker(1 * time.Millisecond)
+	defer tracker.Stop()
 
 	tracker.Update(&LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 1})
 	time.Sleep(5 * time.Millisecond)
@@ -68,6 +73,7 @@ func TestTracker_Staleness(t *testing.T) {
 
 func TestTracker_Concurrent(t *testing.T) {
 	tracker := NewTracker(5 * time.Minute)
+	defer tracker.Stop()
 	var wg sync.WaitGroup
 
 	for i := 0; i < 100; i++ {
@@ -92,6 +98,25 @@ func TestTracker_Concurrent(t *testing.T) {
 	assert.Len(t, active, 1)
 }
 
+func TestTracker_ConcurrentWithCleanup(t *testing.T) {
+	tracker := NewTracker(5 * time.Millisecond)
+	defer tracker.Stop()
+
+	var wg sync.WaitGroup
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			tracker.Update(&LocationReport{
+				VehicleID: fmt.Sprintf("bus-%d", id),
+				Timestamp: 1,
+			})
+			tracker.ActiveVehicles()
+		}(i)
+	}
+	wg.Wait()
+}
+
 func TestNewTracker_PanicsOnInvalidMaxAge(t *testing.T) {
 	assert.PanicsWithValue(t, "maxAge must be positive", func() {
 		NewTracker(0)
@@ -100,4 +125,44 @@ func TestNewTracker_PanicsOnInvalidMaxAge(t *testing.T) {
 	assert.PanicsWithValue(t, "maxAge must be positive", func() {
 		NewTracker(-1 * time.Second)
 	}, "NewTracker with negative duration should panic")
+}
+
+func TestTracker_Cleanup(t *testing.T) {
+
+	maxAge := 10 * time.Millisecond
+	tracker := NewTracker(maxAge)
+	defer tracker.Stop()
+
+	tracker.Update(&LocationReport{VehicleID: "bus-1", Timestamp: 1})
+
+	assert.Eventually(t, func() bool {
+		tracker.mu.RLock()
+		defer tracker.mu.RUnlock()
+		return len(tracker.vehicles) == 0
+	}, 100*time.Millisecond, 5*time.Millisecond, "stale vehicle should be deleted from internal map")
+}
+
+func TestTracker_StopIsIdempotent(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	tracker.Stop()
+	assert.NotPanics(t, func() { tracker.Stop() })
+}
+
+func TestTracker_CleanupPreservesFreshVehicles(t *testing.T) {
+	maxAge := 50 * time.Millisecond
+	tracker := NewTracker(maxAge)
+	defer tracker.Stop()
+
+	tracker.Update(&LocationReport{VehicleID: "old-bus", Timestamp: 1})
+	time.Sleep(60 * time.Millisecond)
+	tracker.Update(&LocationReport{VehicleID: "new-bus", Timestamp: 2})
+
+	assert.Eventually(t, func() bool {
+		tracker.mu.RLock()
+		defer tracker.mu.RUnlock()
+		_, hasOld := tracker.vehicles["old-bus"]
+		_, hasNew := tracker.vehicles["new-bus"]
+		return !hasOld && hasNew
+	}, 200*time.Millisecond, 5*time.Millisecond,
+		"cleanup should remove old-bus but keep new-bus")
 }
