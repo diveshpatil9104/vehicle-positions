@@ -18,6 +18,20 @@ type contextKey string
 
 const claimsKey contextKey = "claims"
 
+const bcryptCost = bcrypt.DefaultCost
+
+var dummyHash []byte
+
+func init() {
+	// Generate a valid hash at startup using the central cost.
+	// This ensures our timing side-channel prevention always matches the real hashing time.
+	var err error
+	dummyHash, err = bcrypt.GenerateFromPassword([]byte("dummy"), bcryptCost)
+	if err != nil {
+		panic("failed to generate dummy hash at startup: " + err.Error())
+	}
+}
+
 // LoginRequest is the JSON payload for POST /api/v1/auth/login.
 type LoginRequest struct {
 	Email    string `json:"email"`
@@ -50,7 +64,7 @@ func handleLogin(fetcher UserFetcher, secret []byte) http.HandlerFunc {
 		user, err := fetcher.GetUserByEmail(r.Context(), req.Email)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				bcrypt.CompareHashAndPassword([]byte("$2a$10$0000000000000000000000uaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), []byte(req.Password))
+				bcrypt.CompareHashAndPassword(dummyHash, []byte(req.Password))
 				writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid email or password"})
 				return
 			}
