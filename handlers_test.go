@@ -205,6 +205,31 @@ func TestHandlePostLocation_Validation(t *testing.T) {
 			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 0},
 			want: "timestamp must be positive",
 		},
+		{
+			name: "vehicle_id too long",
+			loc:  LocationReport{VehicleID: "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix()},
+			want: "vehicle_id must be at most 50 characters",
+		},
+		{
+			name: "vehicle_id with spaces",
+			loc:  LocationReport{VehicleID: "bus 1", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix()},
+			want: "vehicle_id must contain only alphanumeric characters, dots, hyphens, and underscores",
+		},
+		{
+			name: "vehicle_id with special characters",
+			loc:  LocationReport{VehicleID: "bus@1!", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix()},
+			want: "vehicle_id must contain only alphanumeric characters, dots, hyphens, and underscores",
+		},
+		{
+			name: "timestamp too far in past",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 100},
+			want: "timestamp must be within 5 minutes of server time",
+		},
+		{
+			name: "timestamp too far in future",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix() + 600},
+			want: "timestamp must be within 5 minutes of server time",
+		},
 	}
 
 	for _, tc := range tests {
@@ -304,6 +329,21 @@ func TestHandleAdminStatus_ZeroVehiclesNotNull(t *testing.T) {
 	assert.Equal(t, float64(0), raw["total_vehicles_tracked"])
 }
 
+func TestHandlePostLocation_ValidVehicleIDBoundary(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	defer tracker.Stop()
+	mStore := &mockStore{}
+	handler := handlePostLocation(mStore, tracker)
+
+	// Exactly 50 chars with hyphens and underscores
+	loc := LocationReport{VehicleID: "abcdefghij-klmnopqrst_uvwxyz-1234567890_abcdefghij", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix()}
+	require.Len(t, loc.VehicleID, 50)
+	w := postLocation(handler, loc)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.True(t, mStore.saved)
+}
+
 type mockStore struct {
 	err   error
 	saved bool
@@ -322,7 +362,7 @@ func TestHandlePostLocation_HappyPath(t *testing.T) {
 	mStore := &mockStore{}
 	handler := handlePostLocation(mStore, tracker)
 
-	loc := LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 100}
+	loc := LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix()}
 	w := postLocation(handler, loc)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
@@ -335,7 +375,7 @@ func TestHandlePostLocation_StoreFailure(t *testing.T) {
 	mStore := &mockStore{err: fmt.Errorf("database down")}
 	handler := handlePostLocation(mStore, tracker)
 
-	loc := LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: 100}
+	loc := LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix()}
 	w := postLocation(handler, loc)
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
@@ -382,7 +422,7 @@ func TestHandlePostLocation_ContentTypeWithCharsetAccepted(t *testing.T) {
 	tracker := NewTracker(5 * time.Minute)
 	mStore := &mockStore{}
 	handler := handlePostLocation(mStore, tracker)
-	body := []byte(`{"vehicle_id":"bus-1","latitude":1,"longitude":2,"timestamp":100}`)
+	body := []byte(fmt.Sprintf(`{"vehicle_id":"bus-1","latitude":1,"longitude":2,"timestamp":%d}`, time.Now().Unix()))
 
 	w := postLocationWithBody(handler, body, "application/json; charset=utf-8")
 	assert.Equal(t, http.StatusCreated, w.Code)
@@ -450,7 +490,7 @@ func TestHandlePostLocation_TrailingWhitespaceAccepted(t *testing.T) {
 	mStore := &mockStore{}
 	handler := handlePostLocation(mStore, tracker)
 
-	body := []byte("{\"vehicle_id\":\"bus-1\",\"latitude\":1,\"longitude\":2,\"timestamp\":100}   \n")
+	body := []byte(fmt.Sprintf(`{"vehicle_id":"bus-1","latitude":1,"longitude":2,"timestamp":%d}   `+"\n", time.Now().Unix()))
 	w := postLocationWithBody(handler, body, "application/json")
 
 	assert.Equal(t, http.StatusCreated, w.Code)

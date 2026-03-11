@@ -8,6 +8,7 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -28,9 +29,21 @@ type LocationReport struct {
 	Timestamp int64   `json:"timestamp"`
 }
 
+const maxVehicleIDLength = 50
+
+var vehicleIDPattern = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
+
+const maxTimestampSkew = 5 * time.Minute
+
 func (r *LocationReport) validate() error {
 	if r.VehicleID == "" {
 		return fmt.Errorf("vehicle_id is required")
+	}
+	if len(r.VehicleID) > maxVehicleIDLength {
+		return fmt.Errorf("vehicle_id must be at most %d characters", maxVehicleIDLength)
+	}
+	if !vehicleIDPattern.MatchString(r.VehicleID) {
+		return fmt.Errorf("vehicle_id must contain only alphanumeric characters, dots, hyphens, and underscores")
 	}
 	if r.Latitude == 0 && r.Longitude == 0 {
 		return fmt.Errorf("latitude and longitude cannot both be zero (likely GPS error)")
@@ -43,6 +56,10 @@ func (r *LocationReport) validate() error {
 	}
 	if r.Timestamp <= 0 {
 		return fmt.Errorf("timestamp must be positive")
+	}
+	now := time.Now().Unix()
+	if r.Timestamp < now-int64(maxTimestampSkew.Seconds()) || r.Timestamp > now+int64(maxTimestampSkew.Seconds()) {
+		return fmt.Errorf("timestamp must be within %d minutes of server time", int(maxTimestampSkew.Minutes()))
 	}
 	return nil
 }
