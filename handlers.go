@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"mime"
 	"net/http"
 	"strings"
@@ -83,7 +83,7 @@ func handlePostLocation(store LocationSaver, tracker *Tracker) http.HandlerFunc 
 		}
 
 		if err := store.SaveLocation(r.Context(), &loc); err != nil {
-			log.Printf("failed to save location for vehicle %s: %v", loc.VehicleID, err)
+			slog.Error("failed to save location", "vehicle_id", loc.VehicleID, "error", err)
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to save location"})
 			return
 		}
@@ -102,26 +102,26 @@ func handleGetFeed(tracker *Tracker) http.HandlerFunc {
 		if r.URL.Query().Get("format") == "json" {
 			data, err := protojson.Marshal(feed)
 			if err != nil {
-				log.Printf("failed to marshal feed as JSON: %v", err)
+				slog.Error("failed to marshal feed", "format", "json", "error", err)
 				writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to marshal feed"})
 				return
 			}
 			w.Header().Set("Content-Type", "application/json")
 			if _, err := w.Write(data); err != nil {
-				log.Printf("failed to write JSON response: %v", err)
+				slog.Error("failed to write response", "format", "json", "error", err)
 			}
 			return
 		}
 
 		data, err := proto.Marshal(feed)
 		if err != nil {
-			log.Printf("failed to marshal feed as protobuf: %v", err)
+			slog.Error("failed to marshal feed", "format", "protobuf", "error", err)
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to marshal feed"})
 			return
 		}
 		w.Header().Set("Content-Type", "application/x-protobuf")
 		if _, err := w.Write(data); err != nil {
-			log.Printf("failed to write protobuf response: %v", err)
+			slog.Error("failed to write response", "format", "protobuf", "error", err)
 		}
 	}
 }
@@ -191,6 +191,6 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(v); err != nil {
-		log.Printf("failed to write JSON response: %v", err)
+		slog.Error("failed to write JSON response", "error", err)
 	}
 }

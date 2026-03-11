@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+
 	port := envOrDefault("PORT", "8080")
 	databaseURL := envOrDefault("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/vehicle_positions?sslmode=disable")
 	maxAge := envDurationOrDefault("STALENESS_THRESHOLD", 5*time.Minute)
@@ -24,11 +26,13 @@ func main() {
 
 	store, err := NewStore(ctx, databaseURL)
 	if err != nil {
-		log.Fatalf("failed to initialize store: %v", err)
+		slog.Error("failed to initialize store", "error", err)
+		os.Exit(1)
 	}
 
 	if err := store.Migrate(databaseURL); err != nil {
-		log.Fatalf("could not run migrations: %v", err)
+		slog.Error("could not run migrations", "error", err)
+		os.Exit(1)
 	}
 
 	defer store.Close()
@@ -39,12 +43,12 @@ func main() {
 	cutoff := time.Now().Add(-maxAge)
 	recentLocations, err := store.GetRecentLocations(ctx, cutoff)
 	if err != nil {
-		log.Printf("warning: failed to seed tracker from database: %v", err)
+		slog.Warn("failed to seed tracker from database", "error", err)
 	} else {
 		for _, loc := range recentLocations {
 			tracker.Update(loc)
 		}
-		log.Printf("seeded tracker with %d active vehicles", len(recentLocations))
+		slog.Info("seeded tracker", "active_vehicles", len(recentLocations))
 	}
 
 	startTime := time.Now()
@@ -59,26 +63,27 @@ func main() {
 
 	srv := &http.Server{
 		Addr:         ":" + port,
-		Handler:      mux,
+		Handler:      requestLogger(mux),
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 		IdleTimeout:  idleTimeout,
 	}
 
 	go func() {
-		log.Printf("starting vehicle-positions server on http://localhost:%s", port)
+		slog.Info("starting server", "port", port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("server error: %v", err)
+			slog.Error("server error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
 	<-ctx.Done()
-	log.Println("shutting down...")
+	slog.Info("shutting down")
 
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer shutdownCancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Printf("shutdown error: %v", err)
+		slog.Error("shutdown error", "error", err)
 	}
 }
 
@@ -93,10 +98,34 @@ func envDurationOrDefault(key string, fallback time.Duration) time.Duration {
 	if v := os.Getenv(key); v != "" {
 		d, err := time.ParseDuration(v)
 		if err != nil {
-			log.Printf("invalid duration for %s: %q, using default %v", key, v, fallback)
+			slog.Warn("invalid duration, using default", "key", key, "value", v, "default", fallback)
 			return fallback
 		}
 		return d
 	}
 	return fallback
+}
+
+type statusRecorder struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *statusRecorder) WriteHeader(code int) {
+	r.status = code
+	r.ResponseWriter.WriteHeader(code)
+}
+
+func requestLogger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+		next.ServeHTTP(rec, r)
+		slog.Info("request",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", rec.status,
+			"duration", time.Since(start).String(),
+		)
+	})
 }
