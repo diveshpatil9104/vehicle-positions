@@ -67,7 +67,7 @@ func handleLogin(fetcher UserFetcher, secret []byte) http.HandlerFunc {
 		user, err := fetcher.GetUserByEmail(r.Context(), req.Email)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				bcrypt.CompareHashAndPassword(dummyHash, []byte(req.Password))
+				_ = bcrypt.CompareHashAndPassword(dummyHash, []byte(req.Password)) // timing side-channel prevention
 				writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid email or password"})
 				return
 			}

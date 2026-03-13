@@ -195,7 +195,18 @@ func TestRequireAuth_ValidToken(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	w := httptest.NewRecorder()
 
-	requireAuth(testSecret)(dummyHandler()).ServeHTTP(w, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		claims, ok := r.Context().Value(claimsKey).(jwt.MapClaims)
+		if !ok {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		assert.Equal(t, "driver@test.com", claims["email"])
+		w.WriteHeader(http.StatusOK)
+	})
+
+	requireAuth(testSecret)(handler).ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }

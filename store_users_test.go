@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -42,4 +44,5 @@ func TestStore_GetUserByEmail_NotFound(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, user)
+	assert.True(t, errors.Is(err, pgx.ErrNoRows), "error must wrap pgx.ErrNoRows so auth handler can distinguish not-found from database failures")
 }
