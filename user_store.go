@@ -9,6 +9,7 @@ import (
 
 	"github.com/OneBusAway/vehicle-positions/db"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -113,6 +114,8 @@ func (s *Store) CreateUser(ctx context.Context, name, email, password, role stri
 	}, nil
 }
 
+// UpdateUser updates a user's name, email, and role.
+// TODO: password changes are not supported via this endpoint; add a separate PATCH /password endpoint.
 func (s *Store) UpdateUser(ctx context.Context, id int64, name, email, role string) (*UserResponse, error) {
 	row, err := s.queries.UpdateUser(ctx, db.UpdateUserParams{
 		Name:  name,
@@ -153,5 +156,9 @@ func (s *Store) DeactivateUser(ctx context.Context, id int64) error {
 
 // isDuplicateEmail checks if the error is a PostgreSQL unique violation on the email column.
 func isDuplicateEmail(err error) bool {
-	return err != nil && strings.Contains(err.Error(), "users_email_key")
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" && strings.Contains(pgErr.ConstraintName, "email") {
+		return true
+	}
+	return false
 }

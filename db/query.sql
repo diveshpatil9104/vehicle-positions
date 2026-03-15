@@ -30,6 +30,7 @@ VALUES ($1, $2, $3, $4)
 RETURNING id, name, email, role, created_at, updated_at;
 
 -- name: UpdateUser :one
+-- updated_at is maintained by the set_users_updated_at trigger.
 UPDATE users
 SET name = $1, email = $2, role = $3
 WHERE id = $4

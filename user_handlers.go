@@ -60,7 +60,10 @@ func handleGetUser(store UserGetter) http.HandlerFunc {
 
 func handleCreateUser(store UserCreator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !requireContentType(w, r) {
+		contentType := r.Header.Get("Content-Type")
+		mediaType, _, err := mime.ParseMediaType(contentType)
+		if err != nil || !strings.EqualFold(mediaType, "application/json") {
+			writeJSON(w, http.StatusUnsupportedMediaType, map[string]string{"error": "Content-Type must be application/json"})
 			return
 		}
 
@@ -118,7 +121,10 @@ func handleCreateUser(store UserCreator) http.HandlerFunc {
 
 func handleUpdateUser(store UserUpdater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !requireContentType(w, r) {
+		contentType := r.Header.Get("Content-Type")
+		mediaType, _, err := mime.ParseMediaType(contentType)
+		if err != nil || !strings.EqualFold(mediaType, "application/json") {
+			writeJSON(w, http.StatusUnsupportedMediaType, map[string]string{"error": "Content-Type must be application/json"})
 			return
 		}
 
@@ -193,7 +199,7 @@ func handleDeactivateUser(store UserDeactivator) http.HandlerFunc {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal server error"})
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
@@ -207,14 +213,4 @@ func parseUserID(r *http.Request) (int64, error) {
 		return 0, errors.New("invalid id")
 	}
 	return id, nil
-}
-
-func requireContentType(w http.ResponseWriter, r *http.Request) bool {
-	contentType := r.Header.Get("Content-Type")
-	mediaType, _, err := mime.ParseMediaType(contentType)
-	if err != nil || !strings.EqualFold(mediaType, "application/json") {
-		writeJSON(w, http.StatusUnsupportedMediaType, map[string]string{"error": "Content-Type must be application/json"})
-		return false
-	}
-	return true
 }
