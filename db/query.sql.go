@@ -13,7 +13,7 @@ import (
 
 const getRecentLocations = `-- name: GetRecentLocations :many
 SELECT DISTINCT ON (vehicle_id)
-    vehicle_id, trip_id, latitude, longitude, bearing, speed, accuracy, timestamp
+    vehicle_id, trip_id, latitude, longitude, bearing, speed, accuracy, timestamp, driver_id
 FROM location_points
 WHERE received_at > $1
 ORDER BY vehicle_id, received_at DESC
@@ -28,6 +28,7 @@ type GetRecentLocationsRow struct {
 	Speed     pgtype.Float8
 	Accuracy  pgtype.Float8
 	Timestamp int64
+	DriverID  string
 }
 
 func (q *Queries) GetRecentLocations(ctx context.Context, receivedAt pgtype.Timestamptz) ([]GetRecentLocationsRow, error) {
@@ -48,6 +49,7 @@ func (q *Queries) GetRecentLocations(ctx context.Context, receivedAt pgtype.Time
 			&i.Speed,
 			&i.Accuracy,
 			&i.Timestamp,
+			&i.DriverID,
 		); err != nil {
 			return nil, err
 		}
@@ -60,8 +62,8 @@ func (q *Queries) GetRecentLocations(ctx context.Context, receivedAt pgtype.Time
 }
 
 const insertLocationPoint = `-- name: InsertLocationPoint :exec
-INSERT INTO location_points (vehicle_id, trip_id, latitude, longitude, bearing, speed, accuracy, timestamp)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO location_points (vehicle_id, trip_id, latitude, longitude, bearing, speed, accuracy, timestamp, driver_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type InsertLocationPointParams struct {
@@ -73,6 +75,7 @@ type InsertLocationPointParams struct {
 	Speed     pgtype.Float8
 	Accuracy  pgtype.Float8
 	Timestamp int64
+	DriverID  string
 }
 
 func (q *Queries) InsertLocationPoint(ctx context.Context, arg InsertLocationPointParams) error {
@@ -85,6 +88,7 @@ func (q *Queries) InsertLocationPoint(ctx context.Context, arg InsertLocationPoi
 		arg.Speed,
 		arg.Accuracy,
 		arg.Timestamp,
+		arg.DriverID,
 	)
 	return err
 }

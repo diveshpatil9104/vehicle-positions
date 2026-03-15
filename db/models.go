@@ -19,6 +19,17 @@ type LocationPoint struct {
 	Accuracy   pgtype.Float8
 	Timestamp  int64
 	ReceivedAt pgtype.Timestamptz
+	DriverID   string
+}
+
+type User struct {
+	ID           int64
+	Name         string
+	Email        string
+	PasswordHash string
+	Role         string
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
 }
 
 type Vehicle struct {

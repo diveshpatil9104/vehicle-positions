@@ -1,0 +1,1 @@
+ALTER TABLE location_points DROP COLUMN driver_id;

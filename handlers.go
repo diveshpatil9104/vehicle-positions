@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
+	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -27,6 +28,8 @@ type LocationReport struct {
 	Speed     float64 `json:"speed"`
 	Accuracy  float64 `json:"accuracy"`
 	Timestamp int64   `json:"timestamp"`
+	// Set server-side from JWT; never decoded from JSON.
+	DriverID string `json:"-"`
 }
 
 const maxVehicleIDLength = 50
@@ -68,7 +71,7 @@ type LocationSaver interface {
 	SaveLocation(ctx context.Context, loc *LocationReport) error
 }
 
-func handlePostLocation(store LocationSaver, tracker *Tracker) http.HandlerFunc {
+func handlePostLocation(store LocationSaver, tracker *Tracker, rl *VehicleRateLimiter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		contentType := r.Header.Get("Content-Type")
 		mediaType, _, err := mime.ParseMediaType(contentType)
@@ -77,7 +80,7 @@ func handlePostLocation(store LocationSaver, tracker *Tracker) http.HandlerFunc 
 			return
 		}
 
-		r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1MB
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
 		var loc LocationReport
 		decoder := json.NewDecoder(r.Body)
@@ -96,6 +99,24 @@ func handlePostLocation(store LocationSaver, tracker *Tracker) http.HandlerFunc 
 
 		if err := loc.validate(); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+
+		claims, ok := r.Context().Value(claimsKey).(jwt.MapClaims)
+		if !ok {
+			slog.Warn("handlePostLocation: JWT claims missing from context")
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal server error"})
+			return
+		}
+		sub, ok := claims["sub"].(string)
+		if !ok || sub == "" {
+			slog.Warn("handlePostLocation: JWT sub claim missing or not a string")
+			writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid token: missing subject"})
+			return
+		}
+		loc.DriverID = sub
+		if !rl.Allow(loc.DriverID) {
+			writeJSON(w, http.StatusTooManyRequests, map[string]string{"error": "rate limit exceeded: at most one location report per 5 seconds per driver"})
 			return
 		}
 

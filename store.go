@@ -96,6 +96,7 @@ func (s *Store) SaveLocation(ctx context.Context, loc *LocationReport) error {
 		Speed:     pgtype.Float8{Float64: loc.Speed, Valid: true},
 		Accuracy:  pgtype.Float8{Float64: loc.Accuracy, Valid: true},
 		Timestamp: loc.Timestamp,
+		DriverID:  loc.DriverID,
 	}); err != nil {
 		return fmt.Errorf("insert location: %w", err)
 	}
@@ -121,6 +122,7 @@ func (s *Store) GetRecentLocations(ctx context.Context, cutoff time.Time) ([]*Lo
 			Latitude:  row.Latitude,
 			Longitude: row.Longitude,
 			Timestamp: row.Timestamp,
+			DriverID:  row.DriverID,
 		}
 		if row.Bearing.Valid {
 			loc.Bearing = row.Bearing.Float64

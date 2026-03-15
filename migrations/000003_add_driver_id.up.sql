@@ -1,0 +1,1 @@
+ALTER TABLE location_points ADD COLUMN driver_id TEXT NOT NULL DEFAULT '';
