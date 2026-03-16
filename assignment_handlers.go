@@ -109,6 +109,7 @@ func handleDeleteAssignment(store AssignmentDeleter) http.HandlerFunc {
 		err = store.DeleteAssignment(r.Context(), userID, vehicleID)
 		if err != nil {
 			if errors.Is(err, ErrAssignmentNotFound) {
+				slog.Warn("delete assignment: not found", "user_id", userID, "vehicle_id", vehicleID)
 				writeJSON(w, http.StatusNotFound, map[string]string{"error": "assignment not found"})
 				return
 			}
