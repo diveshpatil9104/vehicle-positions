@@ -106,6 +106,11 @@ func TestBuildFeed_WithVehicles(t *testing.T) {
 
 	require.NotNil(t, bus2)
 	assert.Nil(t, bus2.Vehicle.Trip, "bus-2 has no trip, Trip should be nil")
+
+	// E012: header timestamp must be >= max entity timestamp.
+	// 1752566500 is the larger of the two vehicle timestamps above (bus-2).
+	assert.GreaterOrEqual(t, feed.Header.GetTimestamp(), uint64(1752566500),
+		"header timestamp must be >= max entity timestamp (E012)")
 }
 
 func TestGetFeed_Protobuf(t *testing.T) {
@@ -234,6 +239,36 @@ func TestHandlePostLocation_Validation(t *testing.T) {
 			name: "timestamp too far in future",
 			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: time.Now().Unix() + 600},
 			want: "timestamp must be within 5 minutes of server time",
+		},
+		{
+			name: "bearing negative",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Bearing: float64ptr(-1), Timestamp: time.Now().Unix()},
+			want: "bearing must be between 0 and 360 (inclusive)",
+		},
+		{
+			name: "bearing too high",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Bearing: float64ptr(361), Timestamp: time.Now().Unix()},
+			want: "bearing must be between 0 and 360 (inclusive)",
+		},
+		{
+			name: "speed negative",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Speed: float64ptr(-5), Timestamp: time.Now().Unix()},
+			want: "speed must be non-negative",
+		},
+		{
+			name: "bearing just below zero",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Bearing: float64ptr(-0.001), Timestamp: time.Now().Unix()},
+			want: "bearing must be between 0 and 360 (inclusive)",
+		},
+		{
+			name: "bearing just above 360",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Bearing: float64ptr(360.001), Timestamp: time.Now().Unix()},
+			want: "bearing must be between 0 and 360 (inclusive)",
+		},
+		{
+			name: "speed just below zero",
+			loc:  LocationReport{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Speed: float64ptr(-0.001), Timestamp: time.Now().Unix()},
+			want: "speed must be non-negative",
 		},
 	}
 
@@ -792,7 +827,7 @@ func TestBuildFeed_PreservesExplicitZeroBearingAndSpeed(t *testing.T) {
 			Longitude: 2,
 			Bearing:   &zero,
 			Speed:     &zero,
-			Timestamp: 100,
+			Timestamp: time.Now().Unix(),
 		},
 	}
 
@@ -813,7 +848,7 @@ func TestBuildFeed_OmitsUnsetBearingAndSpeed(t *testing.T) {
 			VehicleID: "bus-1",
 			Latitude:  1,
 			Longitude: 2,
-			Timestamp: 100,
+			Timestamp: time.Now().Unix(),
 		},
 	}
 
@@ -825,4 +860,44 @@ func TestBuildFeed_OmitsUnsetBearingAndSpeed(t *testing.T) {
 	assert.Equal(t, float32(2), pos.GetLongitude())
 	assert.Nil(t, pos.Bearing)
 	assert.Nil(t, pos.Speed)
+}
+
+func TestHandlePostLocation_BearingSpeedBoundaries(t *testing.T) {
+	tracker := NewTracker(5 * time.Minute)
+	defer tracker.Stop()
+
+	tests := []struct {
+		name string
+		sub  string
+		loc  LocationReport
+	}{
+		{"bearing exactly 0 (north)", "driver-bearing-0", LocationReport{
+			VehicleID: "bus-1", Latitude: 1, Longitude: 2,
+			Bearing: float64ptr(0), Timestamp: time.Now().Unix()}},
+		{"bearing exactly 360", "driver-bearing-360", LocationReport{
+			VehicleID: "bus-2", Latitude: 1, Longitude: 2,
+			Bearing: float64ptr(360), Timestamp: time.Now().Unix()}},
+		{"bearing 359.99", "driver-bearing-359", LocationReport{
+			VehicleID: "bus-3", Latitude: 1, Longitude: 2,
+			Bearing: float64ptr(359.99), Timestamp: time.Now().Unix()}},
+		{"speed exactly 0 (stationary)", "driver-speed-0", LocationReport{
+			VehicleID: "bus-4", Latitude: 1, Longitude: 2,
+			Speed: float64ptr(0), Timestamp: time.Now().Unix()}},
+		{"nil bearing (not provided)", "driver-bearing-nil", LocationReport{
+			VehicleID: "bus-5", Latitude: 1, Longitude: 2,
+			Timestamp: time.Now().Unix()}},
+		{"nil speed (not provided)", "driver-speed-nil", LocationReport{
+			VehicleID: "bus-6", Latitude: 1, Longitude: 2,
+			Timestamp: time.Now().Unix()}},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			mStore := &mockStore{}
+			handler := handlePostLocation(mStore, tracker, NewVehicleRateLimiter())
+			w := postLocationWithClaims(handler, tc.loc, jwt.MapClaims{"sub": tc.sub})
+			assert.Equal(t, http.StatusCreated, w.Code, "boundary value should be accepted")
+			assert.True(t, mStore.saved, "boundary value should have been saved")
+		})
+	}
 }
