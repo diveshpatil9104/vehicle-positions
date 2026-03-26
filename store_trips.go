@@ -8,6 +8,7 @@ import (
 
 	"github.com/OneBusAway/vehicle-positions/db"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // TripResponse is the API representation of a trip.
@@ -80,15 +81,17 @@ func (s *Store) StartTrip(ctx context.Context, userID int64, vehicleID, routeID,
 		GtfsTripID: gtfsTripID,
 	})
 	if err != nil {
+		// The unique partial index idx_trips_one_active_per_user catches
+		// concurrent inserts that pass the SELECT check above.
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, ErrActiveTripExists
+		}
 		return nil, fmt.Errorf("insert trip: %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return nil, fmt.Errorf("commit tx: %w", err)
-	}
-
-	if !trip.StartTime.Valid {
-		return nil, fmt.Errorf("trip start_time unexpectedly null")
 	}
 
 	resp := &TripResponse{

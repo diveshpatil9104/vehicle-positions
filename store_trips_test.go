@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -230,12 +229,12 @@ func TestStore_StartTrip_ConcurrentAttempts(t *testing.T) {
 	}
 	assert.Equal(t, 1, successCount, "exactly one concurrent StartTrip should succeed")
 
-	// The rest should fail with a known error type.
+	// The rest should fail with ErrActiveTripExists (enforced by unique partial index).
 	var failCount int
 	for err := range failures {
 		failCount++
-		assert.True(t, errors.Is(err, ErrActiveTripExists) || errors.Is(err, ErrNotAssigned),
-			"unexpected failure: %v", err)
+		assert.ErrorIs(t, err, ErrActiveTripExists,
+			"concurrent StartTrip should fail with ErrActiveTripExists, got: %v", err)
 	}
 	assert.Equal(t, goroutines-1, failCount)
 
