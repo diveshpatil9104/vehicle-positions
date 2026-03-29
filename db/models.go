@@ -32,6 +32,12 @@ type User struct {
 	UpdatedAt    pgtype.Timestamptz
 }
 
+type UserVehicle struct {
+	UserID    int64
+	VehicleID string
+	CreatedAt pgtype.Timestamptz
+}
+
 type Vehicle struct {
 	ID        string
 	Label     string

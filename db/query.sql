@@ -59,3 +59,26 @@ RETURNING id, label, agency_tag, active, created_at, updated_at;
 UPDATE vehicles
 SET active = false, updated_at = NOW()
 WHERE id = $1;
+
+-- name: AssignUserVehicle :one
+INSERT INTO user_vehicles (user_id, vehicle_id)
+VALUES ($1, $2)
+RETURNING user_id, vehicle_id, created_at;
+
+-- name: UnassignUserVehicle :execrows
+DELETE FROM user_vehicles
+WHERE user_id = $1 AND vehicle_id = $2;
+
+-- name: ListVehiclesByUser :many
+SELECT user_id, vehicle_id, created_at
+FROM user_vehicles
+WHERE user_id = $1
+ORDER BY created_at DESC
+LIMIT 1000;
+
+-- name: ListUsersByVehicle :many
+SELECT user_id, vehicle_id, created_at
+FROM user_vehicles
+WHERE vehicle_id = $1
+ORDER BY created_at DESC
+LIMIT 1000;
