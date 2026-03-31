@@ -38,7 +38,7 @@ func handleCreateAssignment(store AssignmentCreator) http.HandlerFunc {
 		if err := decoder.Decode(new(json.RawMessage)); err == nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON: request body must contain a single JSON object and no trailing data"})
 			return
-		} else if err != io.EOF {
+		} else if !errors.Is(err, io.EOF) {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON: " + err.Error()})
 			return
 		}

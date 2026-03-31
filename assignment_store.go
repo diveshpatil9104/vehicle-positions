@@ -61,7 +61,8 @@ func (s *Store) CreateAssignment(ctx context.Context, userID int64, vehicleID st
 			case "user_vehicles_vehicle_id_fkey":
 				return nil, ErrVehicleNotFoundFK
 			default:
-				return nil, fmt.Errorf("create assignment: unrecognized FK constraint %q: %w", fkConstraintName(err), err)
+				name := fkConstraintName(err)
+				return nil, fmt.Errorf("create assignment: unrecognized FK constraint %q: %w", name, err)
 			}
 		}
 		return nil, fmt.Errorf("create assignment: %w", err)
