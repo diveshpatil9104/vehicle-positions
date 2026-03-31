@@ -55,13 +55,13 @@ func (s *Store) CreateAssignment(ctx context.Context, userID int64, vehicleID st
 			return nil, ErrAssignmentExists
 		}
 		if isFKViolation(err) {
-			switch fkConstraintName(err) {
+			name := fkConstraintName(err)
+			switch name {
 			case "user_vehicles_user_id_fkey":
 				return nil, ErrUserNotFoundFK
 			case "user_vehicles_vehicle_id_fkey":
 				return nil, ErrVehicleNotFoundFK
 			default:
-				name := fkConstraintName(err)
 				return nil, fmt.Errorf("create assignment: unrecognized FK constraint %q: %w", name, err)
 			}
 		}
