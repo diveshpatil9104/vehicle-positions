@@ -63,6 +63,10 @@ func TestBuildFeed_Empty(t *testing.T) {
 }
 
 func TestBuildFeed_WithVehicles(t *testing.T) {
+	now := time.Now().Unix()
+	bus1Ts := now - 100
+	bus2Ts := now
+
 	vehicles := []*VehicleState{
 		{
 			VehicleID: "bus-1",
@@ -71,13 +75,13 @@ func TestBuildFeed_WithVehicles(t *testing.T) {
 			Longitude: 36.82,
 			Bearing:   float64ptr(180),
 			Speed:     float64ptr(8.5),
-			Timestamp: 1752566400,
+			Timestamp: bus1Ts,
 		},
 		{
 			VehicleID: "bus-2",
 			Latitude:  -1.30,
 			Longitude: 36.83,
-			Timestamp: 1752566500,
+			Timestamp: bus2Ts,
 		},
 	}
 
@@ -85,7 +89,6 @@ func TestBuildFeed_WithVehicles(t *testing.T) {
 
 	require.Len(t, feed.Entity, 2)
 
-	// Find bus-1
 	var bus1, bus2 *gtfs.FeedEntity
 	for _, e := range feed.Entity {
 		switch e.GetId() {
@@ -101,15 +104,14 @@ func TestBuildFeed_WithVehicles(t *testing.T) {
 	assert.Equal(t, float32(36.82), bus1.Vehicle.Position.GetLongitude())
 	assert.Equal(t, float32(180), bus1.Vehicle.Position.GetBearing())
 	assert.Equal(t, float32(8.5), bus1.Vehicle.Position.GetSpeed())
-	assert.Equal(t, uint64(1752566400), bus1.Vehicle.GetTimestamp())
+	assert.Equal(t, uint64(bus1Ts), bus1.Vehicle.GetTimestamp())
 	assert.Equal(t, "route-5", bus1.Vehicle.Trip.GetTripId())
 
 	require.NotNil(t, bus2)
 	assert.Nil(t, bus2.Vehicle.Trip, "bus-2 has no trip, Trip should be nil")
 
 	// E012: header timestamp must be >= max entity timestamp.
-	// 1752566500 is the larger of the two vehicle timestamps above (bus-2).
-	assert.GreaterOrEqual(t, feed.Header.GetTimestamp(), uint64(1752566500),
+	assert.GreaterOrEqual(t, feed.Header.GetTimestamp(), uint64(bus2Ts),
 		"header timestamp must be >= max entity timestamp (E012)")
 }
 
