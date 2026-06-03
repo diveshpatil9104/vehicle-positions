@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -91,9 +92,8 @@ func validateFeedCompliance(t *testing.T, feed *gtfs.FeedMessage) []string {
 			}
 
 			// E027: bearing 0..360 (inclusive per MobilityData E027 rule).
-			// buildFeed() always sets Bearing via proto.Float32(), so pos.Bearing
-			// is never nil in current production output. The nil guard is retained
-			// for forward-compatibility if Bearing becomes a pointer type.
+			// Bearing is optional; buildFeed() leaves pos.Bearing nil when the
+			// source vehicle has no bearing, so the nil guard is required.
 			if pos.Bearing != nil {
 				if b := pos.GetBearing(); b < 0 || b > 360 {
 					violations = append(violations, fmt.Sprintf("E027: bearing %f out of range for %q", b, id))
@@ -152,9 +152,9 @@ func TestFeedValidation_E012_HeaderTimestampGEEntityTimestamps(t *testing.T) {
 }
 
 func TestFeedValidation_E012_FutureEntityTimestamp(t *testing.T) {
-	// Vehicle with timestamp 2 minutes in the future (within 5min ingest window).
-	// Header must be >= this timestamp.
-	futureTs := time.Now().Unix() + 120
+	// Use now+30 — within E050's 60s window — so the full compliance
+	// checker can run without triggering E050 on the header.
+	futureTs := time.Now().Unix() + 30
 	vehicles := []*VehicleState{
 		{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: futureTs},
 	}
@@ -165,6 +165,9 @@ func TestFeedValidation_E012_FutureEntityTimestamp(t *testing.T) {
 
 	assert.GreaterOrEqual(t, headerTs, entityTs,
 		"E012: header timestamp must be >= entity timestamp")
+
+	violations := validateFeedCompliance(t, feed)
+	assert.Empty(t, violations)
 }
 
 func TestFeedValidation_E012_AllPastEntities(t *testing.T) {
@@ -276,10 +279,24 @@ func TestFeedValidation_E050_TimestampsNotFarFuture(t *testing.T) {
 	feed := buildFeed(vehicles)
 	violations := validateFeedCompliance(t, feed)
 	assert.Empty(t, violations, "current/past timestamps should not trigger E050")
+}
 
-	// Note: The ingest window allows timestamps up to now+300s, but E050
-	// rejects >now+60s. This is a known limitation documented in the plan.
-	// We do NOT test with now+120 here because it would legitimately fail E050.
+func TestFeedValidation_E050_RejectsEntityFarInFuture(t *testing.T) {
+	now := time.Now().Unix()
+	feed := buildFeed([]*VehicleState{
+		{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: now + 120},
+	})
+	violations := validateFeedCompliance(t, feed)
+	require.NotEmpty(t, violations)
+	joined := strings.Join(violations, "|")
+	assert.Contains(t, joined, "E050:")
+}
+
+func TestFeedValidation_E050_IngestWindowGap(t *testing.T) {
+	// Ingest allows now+300s but E050 rejects >now+60s.
+	// A vehicle at now+120 passes ingest but fails E050.
+	// This test pins the known gap so it stays visible in CI.
+	t.Skip("known limitation: ingest accepts now+300s but E050 rejects >now+60s — tracked for follow-up")
 }
 
 func TestFeedValidation_E052_UniqueVehicleIDs(t *testing.T) {
@@ -292,6 +309,30 @@ func TestFeedValidation_E052_UniqueVehicleIDs(t *testing.T) {
 	feed := buildFeed(vehicles)
 	violations := validateFeedCompliance(t, feed)
 	assert.Empty(t, violations, "unique IDs should not trigger E052")
+}
+
+func TestFeedValidation_E052_RejectsDuplicateIDs(t *testing.T) {
+	now := time.Now().Unix()
+	feed := buildFeed([]*VehicleState{
+		{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: now},
+	})
+	// Inject a separate duplicate entity to exercise the E052 branch.
+	// buildFeed() deduplicates by design (one VehicleState per VehicleID).
+	dup := &gtfs.FeedEntity{
+		Id: proto.String("bus-1"),
+		Vehicle: &gtfs.VehiclePosition{
+			Vehicle:   &gtfs.VehicleDescriptor{Id: proto.String("bus-1")},
+			Position:  &gtfs.Position{Latitude: proto.Float32(1), Longitude: proto.Float32(2)},
+			Timestamp: proto.Uint64(uint64(now)),
+		},
+	}
+	feed.Entity = append(feed.Entity, dup)
+
+	violations := validateFeedCompliance(t, feed)
+	require.NotEmpty(t, violations)
+	joined := strings.Join(violations, "|")
+	assert.Contains(t, joined, "E052:")
+	assert.Contains(t, joined, "bus-1")
 }
 
 func TestFeedValidation_W001_TimestampsPopulated(t *testing.T) {
