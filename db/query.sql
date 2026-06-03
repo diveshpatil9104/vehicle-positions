@@ -90,6 +90,7 @@ DELETE FROM user_vehicles
 WHERE user_id = $1 AND vehicle_id = $2;
 
 -- name: ListVehiclesByUser :many
+-- safety bound; not pagination
 SELECT user_id, vehicle_id, created_at
 FROM user_vehicles
 WHERE user_id = $1
@@ -97,6 +98,7 @@ ORDER BY created_at DESC
 LIMIT 1000;
 
 -- name: ListUsersByVehicle :many
+-- safety bound; not pagination
 SELECT user_id, vehicle_id, created_at
 FROM user_vehicles
 WHERE vehicle_id = $1
