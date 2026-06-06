@@ -16,8 +16,7 @@ import (
 // MobilityData GTFS-RT validator rules for VehiclePosition feeds.
 // Returns a slice of rule violation strings. Empty = compliant.
 //
-// This helper exercises buildFeed() — the real production function —
-// through the lens of every applicable validator rule.
+// Callers typically build a feed via buildFeed() and pass the result here.
 func validateFeedCompliance(t *testing.T, feed *gtfs.FeedMessage) []string {
 	t.Helper()
 	var violations []string
@@ -295,7 +294,7 @@ func TestFeedValidation_E050_RejectsEntityFarInFuture(t *testing.T) {
 func TestFeedValidation_E050_IngestWindowGap(t *testing.T) {
 	// Ingest allows now+300s but E050 rejects >now+60s.
 	// A vehicle at now+120 passes ingest but fails E050.
-	// This test pins the known gap so it stays visible in CI.
+	// Placeholder documenting the gap; skipped pending follow-up — no assertion is made.
 	t.Skip("known limitation: ingest accepts now+300s but E050 rejects >now+60s — tracked for follow-up")
 }
 
@@ -316,8 +315,8 @@ func TestFeedValidation_E052_RejectsDuplicateIDs(t *testing.T) {
 	feed := buildFeed([]*VehicleState{
 		{VehicleID: "bus-1", Latitude: 1, Longitude: 2, Timestamp: now},
 	})
-	// Inject a separate duplicate entity to exercise the E052 branch.
-	// buildFeed() deduplicates by design (one VehicleState per VehicleID).
+	// The Tracker dedups by VehicleID upstream (tracker.go), so buildFeed
+	// never emits duplicate IDs in practice — inject a raw entity to exercise E052.
 	dup := &gtfs.FeedEntity{
 		Id: proto.String("bus-1"),
 		Vehicle: &gtfs.VehiclePosition{
