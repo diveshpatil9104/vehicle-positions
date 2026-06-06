@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -10,6 +11,9 @@ import (
 	"syscall"
 	"time"
 )
+
+//go:embed web/templates web/static
+var files embed.FS
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
@@ -101,6 +105,18 @@ func main() {
 	mux.Handle("DELETE /api/v1/admin/users/{userID}/vehicles/{vehicleID}", authMiddleware(adminMiddleware(handleDeleteAssignment(store))))
 	mux.Handle("GET /api/v1/admin/users/{id}/vehicles", authMiddleware(adminMiddleware(handleListUserVehicles(store))))
 	mux.Handle("GET /api/v1/admin/vehicles/{id}/users", authMiddleware(adminMiddleware(handleListVehicleUsers(store))))
+
+	// Admin UI (server-rendered HTML). This is a proof-of-concept with
+	// placeholder data and no authentication, so it is disabled by default and
+	// must be explicitly turned on via ADMIN_UI_ENABLED. Do not enable it in
+	// production until the routes are gated behind real session auth.
+	if envOrDefault("ADMIN_UI_ENABLED", "false") == "true" {
+		if err := registerAdminUI(mux); err != nil {
+			slog.Error("failed to enable admin UI", "error", err)
+			os.Exit(1)
+		}
+		slog.Warn("admin UI enabled with no authentication — for demo use only, do not expose in production")
+	}
 
 	srv := &http.Server{
 		Addr:         ":" + port,
