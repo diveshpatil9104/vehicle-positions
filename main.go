@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -49,20 +50,26 @@ type appStore interface {
 	VehicleChecker
 	DriverVehicleLister
 	AdminStatsCounter
+	APIKeyStore
+	APIKeyManager
 }
 
 // newMux wires all application routes and returns the configured ServeMux.
 // Extracting route registration here allows tests to build the real mux
 // without a live database, catching middleware wiring gaps like the one fixed
 // in issue #82.
-func newMux(store appStore, tracker *Tracker, rateLimiter *VehicleRateLimiter, jwtSecret []byte, startTime time.Time, loginLimiter *LoginRateLimiter, trustProxy bool) *http.ServeMux {
+func newMux(store appStore, tracker *Tracker, rateLimiter *VehicleRateLimiter, jwtSecret []byte, startTime time.Time, loginLimiter *LoginRateLimiter, trustProxy, feedAuthEnabled bool) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	authMiddleware := requireAuth(jwtSecret)
 	adminMiddleware := requireAdmin()
 
 	mux.Handle("POST /api/v1/auth/login", handleLogin(store, jwtSecret, loginLimiter, trustProxy))
-	mux.HandleFunc("GET /gtfs-rt/vehicle-positions", handleGetFeed(tracker))
+	if feedAuthEnabled {
+		mux.Handle("GET /gtfs-rt/vehicle-positions", requireAPIKey(store, trustProxy)(handleGetFeed(tracker)))
+	} else {
+		mux.HandleFunc("GET /gtfs-rt/vehicle-positions", handleGetFeed(tracker))
+	}
 	mux.Handle("GET /api/v1/admin/status", authMiddleware(adminMiddleware(handleAdminStatus(tracker, startTime))))
 	mux.Handle("GET /api/v1/admin/vehicles", authMiddleware(adminMiddleware(handleListVehicles(store))))
 	mux.Handle("GET /api/v1/admin/vehicles/live", authMiddleware(adminMiddleware(handleLiveVehicles(tracker, store, store))))
@@ -95,6 +102,11 @@ func newMux(store appStore, tracker *Tracker, rateLimiter *VehicleRateLimiter, j
 	mux.Handle("GET /api/v1/admin/users/{id}/vehicles", authMiddleware(adminMiddleware(handleListUserVehicles(store))))
 	mux.Handle("GET /api/v1/admin/vehicles/{id}/users", authMiddleware(adminMiddleware(handleListVehicleUsers(store))))
 
+	// Admin feed API keys
+	mux.Handle("GET /api/v1/admin/api-keys", authMiddleware(adminMiddleware(handleListAPIKeys(store))))
+	mux.Handle("POST /api/v1/admin/api-keys", authMiddleware(adminMiddleware(handleCreateAPIKey(store))))
+	mux.Handle("DELETE /api/v1/admin/api-keys/{id}", authMiddleware(adminMiddleware(handleDeactivateAPIKey(store))))
+
 	return mux
 }
 
@@ -104,9 +116,9 @@ func newMux(store appStore, tracker *Tracker, rateLimiter *VehicleRateLimiter, j
 // and cross-cutting middleware come together.
 func newHandler(store appStore, tracker *Tracker, rateLimiter *VehicleRateLimiter,
 	loginLimiter *LoginRateLimiter, jwtSecret []byte, startTime time.Time,
-	cfg adminUIConfig) (http.Handler, error) {
+	cfg adminUIConfig, feedAuthEnabled bool) (http.Handler, error) {
 
-	mux := newMux(store, tracker, rateLimiter, jwtSecret, startTime, loginLimiter, cfg.trustProxy)
+	mux := newMux(store, tracker, rateLimiter, jwtSecret, startTime, loginLimiter, cfg.trustProxy, feedAuthEnabled)
 
 	if cfg.enabled {
 		ui, err := newAdminUI(store, tracker, jwtSecret, loginLimiter, cfg)
@@ -194,8 +206,15 @@ func main() {
 
 	startTime := time.Now()
 
+	// Feed auth is opt-in: enabling it rejects every existing consumer that
+	// does not yet send a key, so an upgrade must not turn it on silently.
+	feedAuthEnabled := envBoolOrDefault("FEED_AUTH_ENABLED", false)
+	if feedAuthEnabled {
+		slog.Info("GTFS-RT feed authentication enabled; consumers must send an X-API-Key header")
+	}
+
 	handler, err := newHandler(store, tracker, rateLimiter, loginLimiter, jwtSecret, startTime,
-		adminUIConfig{enabled: adminUIEnabled(), trustProxy: trustProxyHeaders(), stalenessThreshold: maxAge})
+		adminUIConfig{enabled: adminUIEnabled(), trustProxy: trustProxyHeaders(), stalenessThreshold: maxAge}, feedAuthEnabled)
 	if err != nil {
 		slog.Error("failed to build handler", "error", err)
 		os.Exit(1)
@@ -242,6 +261,20 @@ func envDurationOrDefault(key string, fallback time.Duration) time.Duration {
 			return fallback
 		}
 		return d
+	}
+	return fallback
+}
+
+// envBoolOrDefault reads a boolean from the environment, falling back to the
+// default when the value is absent or unparseable.
+func envBoolOrDefault(key string, fallback bool) bool {
+	if v := os.Getenv(key); v != "" {
+		b, err := strconv.ParseBool(v)
+		if err != nil {
+			slog.Warn("invalid boolean, using default", "key", key, "value", v, "default", fallback)
+			return fallback
+		}
+		return b
 	}
 	return fallback
 }
