@@ -76,6 +76,7 @@ type adminUI struct {
 	vehicleCreator VehicleCreator
 	userManager    userManager
 	assignments    assignmentManager
+	tokenChecker   TokenChecker
 	jwtSecret      []byte
 	loginLimiter   *LoginRateLimiter
 	cfg            adminUIConfig
@@ -103,6 +104,7 @@ func newAdminUI(store appStore, tracker *Tracker, jwtSecret []byte, limiter *Log
 		vehicleCreator: store,
 		userManager:    store,
 		assignments:    store,
+		tokenChecker:   store,
 		jwtSecret:      jwtSecret,
 		loginLimiter:   limiter,
 		cfg:            cfg,
@@ -113,7 +115,7 @@ func newAdminUI(store appStore, tracker *Tracker, jwtSecret []byte, limiter *Log
 // static assets — that's the caller's responsibility (main's handler
 // construction), keeping this function focused on admin routes only.
 func registerAdminUI(mux *http.ServeMux, ui *adminUI) {
-	protect := requireAdminPage(ui.jwtSecret)
+	protect := requireAdminPage(ui.jwtSecret, ui.tokenChecker)
 
 	mux.HandleFunc("GET /admin/login", ui.loginPage)
 	mux.HandleFunc("POST /admin/login", ui.loginSubmit)
@@ -142,7 +144,7 @@ func registerAdminUI(mux *http.ServeMux, ui *adminUI) {
 }
 
 func (ui *adminUI) rootRedirect(w http.ResponseWriter, r *http.Request) {
-	if _, ok := adminClaimsFromCookie(r, ui.jwtSecret); ok {
+	if _, ok := adminClaimsFromCookie(r, ui.jwtSecret, ui.tokenChecker); ok {
 		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 		return
 	}
@@ -150,7 +152,7 @@ func (ui *adminUI) rootRedirect(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ui *adminUI) loginPage(w http.ResponseWriter, r *http.Request) {
-	if _, ok := adminClaimsFromCookie(r, ui.jwtSecret); ok {
+	if _, ok := adminClaimsFromCookie(r, ui.jwtSecret, ui.tokenChecker); ok {
 		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 		return
 	}

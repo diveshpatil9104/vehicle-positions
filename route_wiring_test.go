@@ -120,6 +120,12 @@ func (n *noopStore) ListTripLocations(_ context.Context, _ int64) ([]LocationPoi
 func (n *noopStore) ListActiveTripsByVehicle(_ context.Context) (map[string]ActiveTripInfo, error) {
 	return nil, nil
 }
+func (n *noopStore) RevokeToken(_ context.Context, _ string, _ int64, _ time.Time) error {
+	return nil
+}
+func (n *noopStore) IsTokenRevoked(_ context.Context, _ string) (bool, error) {
+	return false, nil
+}
 
 // TestAdminRoutes_DriverTokenRejected verifies that every /api/v1/admin/* route
 // is wrapped with adminMiddleware. A valid driver-role JWT must receive 403 on

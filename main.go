@@ -49,6 +49,8 @@ type appStore interface {
 	VehicleChecker
 	DriverVehicleLister
 	AdminStatsCounter
+	TokenRevoker
+	TokenChecker
 }
 
 // newMux wires all application routes and returns the configured ServeMux.
@@ -58,7 +60,7 @@ type appStore interface {
 func newMux(store appStore, tracker *Tracker, rateLimiter *VehicleRateLimiter, jwtSecret []byte, startTime time.Time, loginLimiter *LoginRateLimiter, trustProxy bool) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	authMiddleware := requireAuth(jwtSecret)
+	authMiddleware := requireAuth(jwtSecret, store)
 	adminMiddleware := requireAdmin()
 
 	mux.Handle("POST /api/v1/auth/login", handleLogin(store, jwtSecret, loginLimiter, trustProxy))
