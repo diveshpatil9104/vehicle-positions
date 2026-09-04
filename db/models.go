@@ -22,6 +22,13 @@ type LocationPoint struct {
 	DriverID   string
 }
 
+type RevokedToken struct {
+	Jti       string
+	UserID    int64
+	ExpiresAt pgtype.Timestamptz
+	RevokedAt pgtype.Timestamptz
+}
+
 type Trip struct {
 	ID         int64
 	UserID     int64

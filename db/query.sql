@@ -181,3 +181,12 @@ FROM trips t
 JOIN users u ON u.id = t.user_id
 WHERE t.status = 'active'
 ORDER BY t.vehicle_id, t.start_time DESC;
+
+-- name: RevokeToken :exec
+-- Idempotent: logging out twice must not error.
+INSERT INTO revoked_tokens (jti, user_id, expires_at)
+VALUES ($1, $2, $3)
+ON CONFLICT (jti) DO NOTHING;
+
+-- name: IsTokenRevoked :one
+SELECT EXISTS(SELECT 1 FROM revoked_tokens WHERE jti = $1);
