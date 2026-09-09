@@ -7,7 +7,7 @@
         <p class="mt-0.5 text-xs text-slate-400">{{len .Users}} accounts on this page</p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        {{/* No page param: applying a filter starts over at page 1. active rides along so a search survives the toggle. */}}
+        {{/* No page param: a new search starts over at page 1. active rides along so the search survives the toggle. */}}
         <form method="get" action="/admin/users" class="flex flex-wrap items-center gap-2">
           {{if .ActiveOnly}}<input type="hidden" name="active" value="1">{{end}}
           <select name="role" class="rounded-2xl border border-line bg-white px-3 py-2 text-xs text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100">
