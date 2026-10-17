@@ -27,6 +27,9 @@ jobs:
         run: ./gradlew :app:testDebugUnitTest
       - name: Build release
         run: ./gradlew :app:assembleRelease
+      # The benchmarks need an ARM device and a local server (android/benchmark/README.md), so CI only builds them.
+      - name: Build benchmarks
+        run: ./gradlew :benchmark:assembleBenchmarkRelease
 
   instrumented:
     runs-on: ubuntu-latest
