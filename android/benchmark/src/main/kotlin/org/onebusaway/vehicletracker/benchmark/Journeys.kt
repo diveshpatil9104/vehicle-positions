@@ -94,6 +94,8 @@ fun MacrobenchmarkScope.signIn() {
     // The screen's title says Sign in too; the button's label is the lower of the two.
     device.findObjects(By.text("Sign in")).maxBy { it.visibleBounds.top }.click()
     waitFor(busScreen)
+    // On a phone, Google can offer to save the password the first time; Back dismisses it.
+    if (device.wait(Until.hasObject(By.pkg(PACKAGE).depth(0)), 2_000) != true) device.pressBack()
 }
 
 /** Starts the app in a fresh process, signed in on the bus screen with no trip running. */

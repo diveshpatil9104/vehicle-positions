@@ -1,7 +1,7 @@
 # Benchmarks
 
 Macrobenchmarks of the driver's journeys, measured on a build the way a driver gets it: minified, not debuggable.
-The same journeys, in `Journeys.kt`, generate the app's baseline profile.
+The same journeys, in `Journeys.kt`, generate the app's baseline profile and startup profile.
 
 | Benchmark | What it measures |
 |---|---|
@@ -10,10 +10,11 @@ The same journeys, in `Journeys.kt`, generate the app's baseline profile.
 | `JourneyBenchmark.startTripAndUseTracking` | Starting a trip, the street map, 10 s of Tracking, the trip panel, the End trip dialog, ending the trip |
 | `JourneyBenchmark.resumeAfterTheAppWasKilled` | Reopening after the app was killed mid-trip, through Resume to Tracking, then ending the trip |
 
-Each journey starts from a fresh app process, because the first time a screen opens is the slow case. The first
-launch and the first sign-in are not benchmarked: clearing the app's data from inside a benchmark also stops the
-benchmark, because Android counts its process as using the app. The profile generator still covers sign-in, since a
-fresh install starts signed out.
+Each benchmark runs twice: with no compiled code (`None`, a fresh install before Android compiles anything) and
+compiled from the app's profiles (`Partial`, what a driver gets from the Play Store). Each journey starts from a fresh
+app process, because the first time a screen opens is the slow case. The first launch and the first sign-in are not
+benchmarked: clearing the app's data from inside a benchmark also stops the benchmark, because Android counts its
+process as using the app. The profile generator still covers sign-in, since a fresh install starts signed out.
 
 ## What you need
 
@@ -63,12 +64,28 @@ fresh install starts signed out.
    ./gradlew :benchmark:connectedBenchmarkReleaseAndroidTest
    ```
 
-   To run a single benchmark, add `-Pandroid.testInstrumentationRunnerArguments.class=org.onebusaway.vehicletracker.benchmark.JourneyBenchmark#chooseBusRouteAndRun`.
+   To run a single benchmark, add `-Pandroid.testInstrumentationRunnerArguments.tests_regex=.*chooseBusRouteAndRun.*`.
+   A `class=...#chooseBusRouteAndRun` filter matches nothing, because each test's name ends in its compilation mode.
 
    - **A different server:** pass `-Pandroid.testInstrumentationRunnerArguments.benchServer=http://<host>:8080`, and the same for `benchEmail` and `benchPassword`.
-   - **A phone over USB:** `adb reverse tcp:8080 tcp:8080`, then `benchServer=http://127.0.0.1:8080`.
+   - **A phone over USB:** start the server with `MAP_PMTILES_URL=http://127.0.0.1:8000/seattle.pmtiles`, run
+     `adb reverse tcp:8080 tcp:8080` and `adb reverse tcp:8000 tcp:8000`, and pass `benchServer=http://127.0.0.1:8080`
+     with `ANDROID_SERIAL` set to the phone. Skip `gps.sh`, which only drives an emulator: the phone reports where it
+     really is, so Tracking shows the bus off route, and the journeys still pass.
 
 Results go to `benchmark/build/outputs/connected_android_test_additional_output/`, as JSON and Perfetto traces you can open in Android Studio or https://ui.perfetto.dev.
+
+## Regenerate the profiles
+
+After a change to the screens the journeys walk through, regenerate them with the server, map and GPS from the steps
+above running:
+
+```sh
+./gradlew :app:generateReleaseBaselineProfile -Pandroid.testInstrumentationRunnerArguments.benchServer=http://10.0.2.2:8080
+```
+
+It writes `app/src/release/generated/baselineProfiles/baseline-prof.txt` and `startup-prof.txt`; commit both. The
+`Partial` benchmarks fail if a build has no profile, so a missing one cannot go unnoticed.
 
 ## Reading the numbers
 
@@ -76,7 +93,9 @@ Results go to `benchmark/build/outputs/connected_android_test_additional_output/
 - **`frameOverrunMs`** is how late the frame was against its deadline (Android 12 and later); a positive value is a dropped frame.
 - Compare P50, P90, P95 and P99.
 - **Startup:** `timeToInitialDisplayMs` is the first frame; `timeToFullDisplayMs` is when the screen reports it has its content.
-- **Emulator numbers are relative:** compare two builds on the same emulator in the same session, not against a phone.
+- **Judge a change on a phone.** On an emulator the same build's frame times swing up to five times between
+  iterations, mostly waiting on the Mac's GPU, which hides what a profile or a small fix changes. An emulator is still
+  fine for checking that the journeys run, and its traces show what the code does.
 
 ## Finding where the time goes
 
