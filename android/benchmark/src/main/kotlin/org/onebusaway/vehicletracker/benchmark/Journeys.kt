@@ -8,6 +8,7 @@ import androidx.test.uiautomator.BySelector
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
+import java.util.regex.Pattern
 
 // The driver's journeys through the app, shared by the benchmarks and the baseline profile generator so both measure
 // and warm up the same code. They run against the local benchmark server and its seeded driver (README.md), and find
@@ -154,8 +155,7 @@ fun MacrobenchmarkScope.backAndForward() {
  * Accuracy prompt can appear, and if a permission was revoked the app's own checklist does; both are answered.
  */
 fun MacrobenchmarkScope.startTripOnNowRun() {
-    val run = device.findObject(By.text("Now")) ?: waitFor(By.text("Next"))
-    run.click()
+    waitFor(By.text(Pattern.compile("Now|Next"))).click()
     val deadline = SystemClock.uptimeMillis() + 60_000
     while (SystemClock.uptimeMillis() < deadline && !has(endTripButton)) {
         device.findObject(By.text("Turn on"))?.click()
