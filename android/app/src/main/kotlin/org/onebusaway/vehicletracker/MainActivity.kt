@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.onebusaway.vehicletracker.data.SessionStore
 import org.onebusaway.vehicletracker.data.TrackingRepository
@@ -22,6 +23,7 @@ import org.onebusaway.vehicletracker.service.ServiceController
 import org.onebusaway.vehicletracker.service.rearmWhenActive
 import org.onebusaway.vehicletracker.ui.AppNav
 import org.onebusaway.vehicletracker.ui.AppNavViewModel
+import org.onebusaway.vehicletracker.ui.map.preloadMapEngine
 import org.onebusaway.vehicletracker.ui.theme.AppTheme
 import javax.inject.Inject
 
@@ -42,6 +44,11 @@ class MainActivity : ComponentActivity() {
         // announce grace when a trip is stored.
         splash.setKeepOnScreenCondition { navViewModel.startDestination.value == null }
         enableEdgeToEdge()
+        // Every trip opens the map, so its engine loads in the background once the first screen has its content:
+        // early enough to be ready for Tracking, late enough not to slow the app's start.
+        fullyDrawnReporter.addOnReportDrawnListener {
+            lifecycleScope.launch(Dispatchers.Default) { preloadMapEngine() }
+        }
         setContent {
             AppTheme {
                 // enableEdgeToEdge() makes the system bars transparent, so whatever is behind them shows
