@@ -23,7 +23,17 @@ import java.io.IOException
 import java.security.GeneralSecurityException
 import java.util.Base64
 
-data class Session(val serverUrl: String?, val token: String?, val issuedAtEpochSec: Long?) {
+/**
+ * [email] is the one the driver last signed in with. It stays when the token is cleared, so signing in again
+ * after a session ends asks only for the password; null before the first sign-in, or when an older build
+ * stored the session.
+ */
+data class Session(
+    val serverUrl: String?,
+    val token: String?,
+    val issuedAtEpochSec: Long?,
+    val email: String? = null,
+) {
     fun hasFreshToken(nowEpochSec: Long): Boolean =
         token != null && issuedAtEpochSec != null && nowEpochSec - issuedAtEpochSec < 24 * 3600
 
@@ -48,7 +58,7 @@ internal fun jwtSubject(token: String): String? = try {
 
 interface SessionStore {
     val session: Flow<Session>
-    suspend fun saveLogin(serverUrl: String, token: String, issuedAtEpochSec: Long)
+    suspend fun saveLogin(serverUrl: String, email: String, token: String, issuedAtEpochSec: Long)
     suspend fun clearToken()
 }
 
@@ -64,8 +74,8 @@ private const val LOG_TAG = "SessionStore"
  * [DataStoreTripStateStore] makes — so the upgrade path from the previous build can be
  * unit-tested without an emulator.
  *
- * Only the token is encrypted. The server URL and the issued-at timestamp are not credentials,
- * and leaving them in the clear keeps the upgrade to a single key.
+ * Only the token is encrypted. The server URL, the email and the issued-at timestamp are not
+ * credentials, and leaving them in the clear keeps the upgrade to a single key.
  */
 class EncryptedSessionStore(
     private val dataStore: DataStore<Preferences>,
@@ -73,6 +83,7 @@ class EncryptedSessionStore(
 ) : SessionStore {
     private object Keys {
         val SERVER_URL = stringPreferencesKey("server_url")
+        val EMAIL = stringPreferencesKey("email")
         val TOKEN = stringPreferencesKey("token_enc")
         val TOKEN_ISSUED_AT = longPreferencesKey("token_issued_at")
 
@@ -100,6 +111,7 @@ class EncryptedSessionStore(
                         serverUrl = prefs[Keys.SERVER_URL],
                         token = readToken(prefs),
                         issuedAtEpochSec = prefs[Keys.TOKEN_ISSUED_AT],
+                        email = prefs[Keys.EMAIL],
                     )
                 },
         )
@@ -152,12 +164,13 @@ class EncryptedSessionStore(
         }
     }
 
-    override suspend fun saveLogin(serverUrl: String, token: String, issuedAtEpochSec: Long) {
+    override suspend fun saveLogin(serverUrl: String, email: String, token: String, issuedAtEpochSec: Long) {
         // Encrypt before opening the transaction so a Keystore failure reaches the caller —
         // AuthRepository.login turns it into Result.failure — without half-writing a session.
         val encrypted = cryptor.encrypt(token)
         dataStore.edit { prefs ->
             prefs[Keys.SERVER_URL] = serverUrl
+            prefs[Keys.EMAIL] = email
             prefs[Keys.TOKEN] = encrypted
             prefs[Keys.TOKEN_ISSUED_AT] = issuedAtEpochSec
             prefs.remove(Keys.LEGACY_TOKEN)

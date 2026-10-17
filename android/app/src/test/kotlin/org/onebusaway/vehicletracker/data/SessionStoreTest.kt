@@ -63,16 +63,16 @@ class SessionStoreTest {
     @Test fun `a saved login reads back unchanged`() = runTest {
         val store = EncryptedSessionStore(newDataStore(), FakeCryptor())
 
-        store.saveLogin(SERVER, TOKEN, ISSUED_AT)
+        store.saveLogin(SERVER, EMAIL, TOKEN, ISSUED_AT)
 
-        assertEquals(Session(SERVER, TOKEN, ISSUED_AT), store.session.first())
+        assertEquals(Session(SERVER, TOKEN, ISSUED_AT, EMAIL), store.session.first())
     }
 
     @Test fun `the token never reaches the file in the clear`() = runTest {
         val file = File(tempFolder.newFolder(), "session.preferences_pb")
         val dataStore = newDataStore(file)
 
-        EncryptedSessionStore(dataStore, FakeCryptor()).saveLogin(SERVER, TOKEN, ISSUED_AT)
+        EncryptedSessionStore(dataStore, FakeCryptor()).saveLogin(SERVER, EMAIL, TOKEN, ISSUED_AT)
 
         val prefs = dataStore.data.first()
         assertNull("the plaintext key must not survive a save", prefs[LEGACY_TOKEN_KEY])
@@ -83,13 +83,25 @@ class SessionStoreTest {
         )
     }
 
-    @Test fun `clearing the token keeps the server url`() = runTest {
+    @Test fun `clearing the token keeps the server url and the email`() = runTest {
         val store = EncryptedSessionStore(newDataStore(), FakeCryptor())
-        store.saveLogin(SERVER, TOKEN, ISSUED_AT)
+        store.saveLogin(SERVER, EMAIL, TOKEN, ISSUED_AT)
 
         store.clearToken()
 
-        assertEquals(Session(SERVER, null, null), store.session.first())
+        assertEquals(Session(SERVER, null, null, EMAIL), store.session.first())
+    }
+
+    @Test fun `a session saved before the email was kept still reads, with no email`() = runTest {
+        val dataStore = newDataStore()
+        // The keys exactly as the build before this one wrote them.
+        dataStore.edit { prefs ->
+            prefs[stringPreferencesKey("server_url")] = SERVER
+            prefs[TOKEN_KEY] = FakeCryptor().encrypt(TOKEN)
+            prefs[longPreferencesKey("token_issued_at")] = ISSUED_AT
+        }
+
+        assertEquals(Session(SERVER, TOKEN, ISSUED_AT, null), EncryptedSessionStore(dataStore, FakeCryptor()).session.first())
     }
 
     @Test fun `the session flow re-emits after each write`() = runTest {
@@ -97,10 +109,10 @@ class SessionStoreTest {
 
         store.session.test {
             assertEquals(Session(null, null, null), awaitItem())
-            store.saveLogin(SERVER, TOKEN, ISSUED_AT)
-            assertEquals(Session(SERVER, TOKEN, ISSUED_AT), awaitItem())
+            store.saveLogin(SERVER, EMAIL, TOKEN, ISSUED_AT)
+            assertEquals(Session(SERVER, TOKEN, ISSUED_AT, EMAIL), awaitItem())
             store.clearToken()
-            assertEquals(Session(SERVER, null, null), awaitItem())
+            assertEquals(Session(SERVER, null, null, EMAIL), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -158,7 +170,7 @@ class SessionStoreTest {
     @Test fun `an undecryptable token reads as logged out`() = runTest {
         val dataStore = newDataStore()
         val cryptor = FakeCryptor()
-        EncryptedSessionStore(dataStore, cryptor).saveLogin(SERVER, TOKEN, ISSUED_AT)
+        EncryptedSessionStore(dataStore, cryptor).saveLogin(SERVER, EMAIL, TOKEN, ISSUED_AT)
 
         cryptor.failDecrypt = true
         val session = EncryptedSessionStore(dataStore, cryptor).session.first()
@@ -175,7 +187,7 @@ class SessionStoreTest {
         val dataStore = newDataStore()
         val store = EncryptedSessionStore(dataStore, FakeCryptor().apply { failEncrypt = true })
 
-        val failure = runCatching { store.saveLogin(SERVER, TOKEN, ISSUED_AT) }.exceptionOrNull()
+        val failure = runCatching { store.saveLogin(SERVER, EMAIL, TOKEN, ISSUED_AT) }.exceptionOrNull()
 
         assertTrue("expected a GeneralSecurityException, got $failure", failure is GeneralSecurityException)
         assertTrue("a half-written session is worse than none", dataStore.data.first().asMap().isEmpty())
@@ -247,6 +259,7 @@ class SessionStoreTest {
 
     private companion object {
         const val SERVER = "https://transit.example.org/"
+        const val EMAIL = "maria@metro.example"
         const val TOKEN = "eyJhbGciOiJIUzI1NiJ9.driver42.signature"
         const val ISSUED_AT = 1_785_886_200L
 
