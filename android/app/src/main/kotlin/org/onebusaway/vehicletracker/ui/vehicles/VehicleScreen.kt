@@ -1,5 +1,6 @@
 package org.onebusaway.vehicletracker.ui.vehicles
 
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +63,8 @@ fun VehicleScreen(
     viewModel: VehicleViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    // For startup timing: the screen is complete once the buses are listed, or their failure is.
+    ReportDrawnWhen { state !is VehiclesUiState.Loading }
 
     // Keyed on the id rather than the whole state so typing in the search field does not re-run
     // the effect. VehiclesUiState.Loaded.autoSelectId reads the unfiltered list for the same

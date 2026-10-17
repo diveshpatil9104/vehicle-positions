@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling.preview)
+    // Names each composable in a system trace. It does nothing until a trace with composition tracing is recording.
+    implementation(libs.compose.runtime.tracing)
     implementation(libs.navigation.compose)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)

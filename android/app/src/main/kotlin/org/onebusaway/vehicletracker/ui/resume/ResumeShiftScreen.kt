@@ -1,5 +1,6 @@
 package org.onebusaway.vehicletracker.ui.resume
 
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -73,6 +74,8 @@ fun ResumeShiftScreen(
     viewModel: ResumeShiftViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    // For startup timing: the screen is complete once the trip card has been read off the phone.
+    ReportDrawnWhen { state.card != null }
     ResumeShiftScreenContent(
         state = state,
         now = viewModel::nowEpochSec,

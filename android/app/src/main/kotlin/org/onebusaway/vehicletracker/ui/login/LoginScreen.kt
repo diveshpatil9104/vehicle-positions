@@ -1,5 +1,6 @@
 package org.onebusaway.vehicletracker.ui.login
 
+import androidx.activity.compose.ReportDrawn
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
@@ -98,6 +99,8 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    // For startup timing: the form is complete as soon as it is composed.
+    ReportDrawn()
     LoginScreenContent(
         state = state,
         server = viewModel.server,

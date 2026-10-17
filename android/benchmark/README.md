@@ -78,6 +78,13 @@ Results go to `benchmark/build/outputs/connected_android_test_additional_output/
 - **Startup:** `timeToInitialDisplayMs` is the first frame; `timeToFullDisplayMs` is when the screen reports it has its content.
 - **Emulator numbers are relative:** compare two builds on the same emulator in the same session, not against a phone.
 
+## Finding where the time goes
+
+Every iteration also saves a Perfetto trace next to the JSON. To see each composable by name in it (the app ships
+`runtime-tracing`, which does nothing until this is on), add
+`-Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.fullTracing.enable=true`. Composition tracing has a
+cost of its own, so compare timings from runs without it.
+
 ## Leftover data
 
 The benchmarks sign in once and reuse the session. If the app on the device is signed in to a different server, clear

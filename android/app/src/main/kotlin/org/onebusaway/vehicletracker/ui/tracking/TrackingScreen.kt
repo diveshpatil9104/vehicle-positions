@@ -1,6 +1,7 @@
 package org.onebusaway.vehicletracker.ui.tracking
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
@@ -76,6 +77,8 @@ fun TrackingScreen(
     viewModel: TrackingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    // For startup timing: the screen is complete once it knows the trip it is tracking.
+    ReportDrawnWhen { state.activeTrip != null }
     LifecycleStartEffect(viewModel) {
         viewModel.onScreenVisible(true)
         onStopOrDispose { viewModel.onScreenVisible(false) }
