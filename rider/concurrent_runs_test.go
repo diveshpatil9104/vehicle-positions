@@ -279,8 +279,9 @@ func TestAggregator_RunsAtOneStartTimeTieGoesToTheNewerPoint(t *testing.T) {
 }
 
 // A rider whose point is a minute older than the rest, 240 m back, is where
-// the rest are once carried on at the point's speed: one run, whose estimate
-// trims that rider as it always would, not a second vehicle.
+// the rest are once carried on at the point's speed: one run, not a second
+// vehicle, with that rider counted at the run's place rather than trimmed
+// from it at their old one.
 func TestAggregator_OlderPointIsCarriedOnToItsRun(t *testing.T) {
 	f := newAggFixture(t)
 	headwayT1(f)
@@ -293,7 +294,8 @@ func TestAggregator_OlderPointIsCarriedOnToItsRun(t *testing.T) {
 
 	est := f.agg.Estimates(now, noCover)
 	require.Len(t, est, 1)
-	assert.Equal(t, 2, est[0].Riders)
+	assert.Equal(t, 3, est[0].Riders)
+	assert.InDelta(t, 550, f.t1.Shape.Project(est[0].Pos, nil).AlongShape, 15)
 }
 
 // A run joined by a rider whose point is stale is published where that
@@ -319,4 +321,88 @@ func TestAggregator_StaleRiderCarriedOntoARunIsPublishedWithIt(t *testing.T) {
 	require.Len(t, est, 1)
 	assert.Equal(t, 2, est[0].Riders)
 	assert.InDelta(t, 800, f.t1.Shape.Project(est[0].Pos, nil).AlongShape, 30)
+}
+
+// rideTo registers a trusted ride on T1 whose last point is at along at at,
+// each of its points reporting speed; it reaches along over the 30 s before,
+// from up to 50 m back.
+func (f *aggFixture) rideTo(t *testing.T, id string, along, speed float64, at time.Time) {
+	t.Helper()
+	f.addSession(id, "rider-"+id, TierTrusted)
+	var pts []Point
+	for i := 5; i >= 0; i-- {
+		pts = append(pts, Point{Pos: f.t1.Shape.PointAt(max(0, along-float64(i)*10)), Accuracy: 5, Speed: speed,
+			Timestamp: at.Add(-time.Duration(i) * 6 * time.Second)})
+	}
+	_, err := f.agg.ApplyBatch(id, pts, nil, at.Add(2*time.Second))
+	require.NoError(t, err)
+}
+
+// publishedAlong is where along T1 each published estimate is, in order.
+func publishedAlong(t *testing.T, f *aggFixture, now time.Time) []float64 {
+	t.Helper()
+	var at []float64
+	for _, est := range f.agg.Estimates(now, noCover) {
+		at = append(at, f.t1.Shape.Project(est.Pos, nil).AlongShape)
+	}
+	slices.Sort(at)
+	return at
+}
+
+// A stale rider that joins a run by its carry must not take the run's own
+// rider out of its estimate. F is 80 s old at 500 m and 1 m/s, so its run's
+// vehicle is carried to 580 m; S is 50 s old at 0 m and 15 m/s, carried to
+// 750 m, near enough to join. F's run is still published, with both riders,
+// and so is N's.
+func TestAggregator_StaleRiderJoiningARunKeepsItsRider(t *testing.T) {
+	f := newAggFixture(t)
+	headwayT1(f)
+	now := f.base.Add(10 * time.Minute)
+	f.rideTo(t, "F", 500, 1, now.Add(-80*time.Second))
+	f.rideTo(t, "S", 0, 15, now.Add(-50*time.Second))
+	f.rideTo(t, "N", 1000, 1.7, now)
+
+	est := f.agg.Estimates(now.Add(2*time.Second), noCover)
+	require.Len(t, est, 2, "%v", publishedAlong(t, f, now.Add(2*time.Second)))
+	at := publishedAlong(t, f, now.Add(2*time.Second))
+	assert.InDelta(t, 500, at[0], 30)
+	assert.InDelta(t, 1000, at[1], 30)
+}
+
+// A stale group that joins a run is one vehicle, placed by its newest point:
+// its older points' own carries must not take the run out of its estimate.
+// S1, S2 and S3 stand within 60 m of each other; S1, the newest, is carried
+// to F at 500 m, while S2 and S3, older and faster, would carry to 890 m and
+// 900 m. F's run is still published.
+func TestAggregator_StaleGroupJoiningARunKeepsItsRider(t *testing.T) {
+	f := newAggFixture(t)
+	headwayT1(f)
+	now := f.base.Add(6 * time.Minute)
+	f.rideTo(t, "S1", 0, 10, now.Add(-50*time.Second))
+	f.rideTo(t, "S2", 50, 12, now.Add(-70*time.Second))
+	f.rideTo(t, "S3", 60, 12, now.Add(-70*time.Second))
+	f.rideTo(t, "F", 500, 1.7, now)
+
+	est := f.agg.Estimates(now.Add(2*time.Second), noCover)
+	require.Len(t, est, 1, "%v", publishedAlong(t, f, now.Add(2*time.Second)))
+	assert.InDelta(t, 500, publishedAlong(t, f, now.Add(2*time.Second))[0], 30)
+}
+
+// Stale riders standing by a run count at the place of the run's newest
+// rider, not at their own old points, which would draw the estimate back. A1
+// and A2 are 60 s old at 0 m and 20 m; B1, at 100 m now, and B2, at 160 m
+// 30 s ago, make the run.
+func TestAggregator_StaleRidersStandingByARunCountAtItsNewestPlace(t *testing.T) {
+	f := newAggFixture(t)
+	headwayT1(f)
+	now := f.base.Add(3 * time.Minute)
+	f.rideTo(t, "A1", 0, 15, now.Add(-60*time.Second))
+	f.rideTo(t, "A2", 20, 15, now.Add(-60*time.Second))
+	f.rideTo(t, "B2", 160, 0, now.Add(-30*time.Second))
+	f.rideTo(t, "B1", 100, 0, now)
+
+	est := f.agg.Estimates(now.Add(2*time.Second), noCover)
+	require.Len(t, est, 1)
+	assert.Equal(t, 4, est[0].Riders)
+	assert.InDelta(t, 100, f.t1.Shape.Project(est[0].Pos, nil).AlongShape, 15)
 }

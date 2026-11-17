@@ -637,12 +637,19 @@ type tripGroup struct {
 // of a rider who makes a run, it is on the run of the nearest such rider:
 // riders standing together are on one vehicle, whatever speed an old point
 // gave. Otherwise it is grouped with the other such riders standing near it,
-// and the group is placed where its newest point is carried. It joins the run
-// whose vehicle is nearest that place, within runSplitDistance, with its
-// riders counted where they are carried, so the estimate does not trim them
-// and the run's own riders out against each other; a run's vehicle is where
-// its newest point is carried. A group that reaches no run is a run of its
+// and the group is one vehicle, placed where its newest point is carried. It
+// joins the run whose vehicle is nearest that place, within runSplitDistance;
+// a run's vehicle is where its newest point is carried, so the two are
+// compared at the same moment. A group that reaches no run is a run of its
 // own, as its points stand.
+//
+// A rider on a run by either way counts in the run's estimate at the place of
+// the newest of the riders who make the run, so the estimate is made only
+// from places the run's riders were grouped by and never from an old point's
+// own place or carry. It adds a rider and can draw the estimate towards that
+// newest rider, but cannot leave the run without one: the riders who make a
+// run stand no more than runSplitDistance apart in turn, so the two around
+// the median are both within outlierDistance of it.
 //
 // A trip run by timetable has one run a day, and its riders stay one group,
 // as far apart as they are.
@@ -682,8 +689,10 @@ func (g *tripGroup) runs(th Thresholds, now time.Time) []*tripGroup {
 		fresh = append(fresh, standing{along: m.along, run: len(runs) - 1})
 	}
 	vehicles := make([]float64, len(runs))
+	places := make([]float64, len(runs))
 	for i, run := range runs {
 		vehicles[i] = vehicle(run.members)
+		places[i] = slices.MaxFunc(run.members, byTime).along
 	}
 
 	var lone [][]estimateMember
@@ -693,6 +702,7 @@ func (g *tripGroup) runs(th Thresholds, now time.Time) []*tripGroup {
 				return cmp.Compare(math.Abs(x.along-m.along), math.Abs(y.along-m.along))
 			})
 			if math.Abs(near.along-m.along) <= runSplitDistance {
+				m.along = places[near.run]
 				runs[near.run].members = append(runs[near.run].members, m)
 				continue
 			}
@@ -715,7 +725,7 @@ func (g *tripGroup) runs(th Thresholds, now time.Time) []*tripGroup {
 			continue
 		}
 		for _, m := range group {
-			m.along += carry(m)
+			m.along = places[best]
 			runs[best].members = append(runs[best].members, m)
 		}
 	}
