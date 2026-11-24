@@ -21,15 +21,14 @@ const frequentSpacing = 12 * time.Minute
 // that trip's runs reach the stop, and its timetable where it runs every
 // frequentSpacing or more often.
 type stopSchedule struct {
-	trips [][]stopWindow
+	trips []windowSet
 	// timetable is a window for each two departures in a row of the
 	// timetable no more than frequentSpacing apart, and timetabled those
 	// departures, both in time order.
 	timetable  []stopWindow
 	timetabled []time.Time
-	// tripRuns and timetableRuns are the runs of trips' windows and the
-	// timetable's, as runsOf lays them out.
-	tripRuns      [][]stopRun
+	// timetableRuns are the runs of the timetable's windows, as runsOf lays
+	// them out.
 	timetableRuns []stopRun
 }
 
@@ -49,6 +48,13 @@ type stopWindow struct {
 type stopRun struct {
 	began time.Time
 	last  int
+}
+
+// windowSet is a set of windows whose rates add at the stop, a trip's or the
+// timetable's, with the run of each: runs[k] is the run of windows[k].
+type windowSet struct {
+	windows []stopWindow
+	runs    []stopRun
 }
 
 // runsOf lays out the run of each of a set's windows once, so takenOver can
@@ -140,8 +146,7 @@ func (s *stopSchedule) addTrip(rows []rider.Frequency, dayStart time.Time, offse
 		}
 		windows = append(windows, stopWindow{from: dayStart.Add(row.StartTime + offset), to: dayStart.Add(row.EndTime + offset), headway: row.Headway})
 	}
-	s.trips = append(s.trips, windows)
-	s.tripRuns = append(s.tripRuns, runsOf(windows))
+	s.trips = append(s.trips, windowSet{windows, runsOf(windows)})
 }
 
 // setTimetable sets the stop's timetable: when the direction's timetabled
@@ -194,9 +199,9 @@ func (s *stopSchedule) timetabledAt(at time.Time) bool {
 }
 
 // due are the sets of windows whose rates add at the stop: each trip's, and
-// the timetable's, and their runs, set for set.
-func (s *stopSchedule) due() ([][]stopWindow, [][]stopRun) {
-	return append(slices.Clip(s.trips), s.timetable), append(slices.Clip(s.tripRuns), s.timetableRuns)
+// the timetable's.
+func (s *stopSchedule) due() []windowSet {
+	return append(slices.Clip(s.trips), windowSet{s.timetable, s.timetableRuns})
 }
 
 // stretches are the spans of scheduled service at the stop, in time order:
@@ -206,9 +211,8 @@ func (s *stopSchedule) due() ([][]stopWindow, [][]stopRun) {
 // morning's last.
 func (s *stopSchedule) stretches() []timeSpan {
 	var spans []timeSpan
-	due, _ := s.due()
-	for _, windows := range due {
-		for _, w := range windows {
+	for _, set := range s.due() {
+		for _, w := range set.windows {
 			spans = append(spans, timeSpan{w.from, w.to.Add(w.headway)})
 		}
 	}
@@ -244,15 +248,15 @@ func stretchAt(stretches []timeSpan, t time.Time) int {
 // that window (takenOver). It is zero when nothing is due, which no stretch
 // holds, and a second at the least.
 func (s *stopSchedule) gapAt(t time.Time) time.Duration {
-	due, runs := s.due()
+	due := s.due()
 	found := make([]int, len(due))
-	for i, windows := range due {
-		found[i] = windowAt(windows, t)
+	for i, set := range due {
+		found[i] = windowAt(set.windows, t)
 	}
 	rate := 0.0
 	for i, k := range found {
-		if k >= 0 && !takenOver(due, runs, found, i) {
-			rate += 1 / due[i][k].headway.Seconds()
+		if k >= 0 && !takenOver(due, found, i) {
+			rate += 1 / due[i].windows[k].headway.Seconds()
 		}
 	}
 	if rate == 0 {
@@ -278,15 +282,15 @@ func (s *stopSchedule) gapAt(t time.Time) time.Duration {
 // headway began, two patterns sharing the stop, does not take over. Nor does
 // one that began no later than w's run did, when that run is shorter than a
 // headway, so the set due then that began last always counts.
-func takenOver(due [][]stopWindow, runs [][]stopRun, found []int, i int) bool {
-	run := runs[i][found[i]]
-	end := due[i][run.last]
+func takenOver(due []windowSet, found []int, i int) bool {
+	run := due[i].runs[found[i]]
+	end := due[i].windows[run.last]
 	last := end.to.Add(-end.headway)
 	if run.began.After(last) {
 		last = run.began
 	}
 	for j, k := range found {
-		if j != i && k >= 0 && runs[j][k].began.After(last) {
+		if j != i && k >= 0 && due[j].runs[k].began.After(last) {
 			return true
 		}
 	}
