@@ -44,6 +44,36 @@ func ruleBody(t *testing.T, css, selector string) string {
 	return rule[1]
 }
 
+// whereMotionIsWanted splits the stylesheet into the rules for someone who has
+// not asked their computer for less motion, and all the rest.
+func whereMotionIsWanted(t *testing.T, css string) (wanted, always string) {
+	t.Helper()
+	const open = "@media (prefers-reduced-motion:no-preference){"
+	var in, out strings.Builder
+	for {
+		at := strings.Index(css, open)
+		if at < 0 {
+			break
+		}
+		out.WriteString(css[:at])
+		end := at + len(open)
+		for depth := 1; depth > 0; end++ {
+			require.Less(t, end, len(css), "a block that never closes")
+			switch css[end] {
+			case '{':
+				depth++
+			case '}':
+				depth--
+			}
+		}
+		in.WriteString(css[at+len(open) : end-1])
+		css = css[end:]
+	}
+	out.WriteString(css)
+	require.NotEmpty(t, in.String())
+	return in.String(), out.String()
+}
+
 // splitOutsideBrackets splits a value at the commas that are not inside
 // brackets, so the commas of a cubic-bezier() stay with it.
 func splitOutsideBrackets(value string) []string {
@@ -84,7 +114,7 @@ var pollGlides = []string{"left 10s linear", "transform 10s linear"}
 // and the change then happens with no motion at all.
 func TestMotion_EveryTransitionIsOnTheScale(t *testing.T) {
 	css := builtStylesheet(t)
-	onTheScale := regexp.MustCompile(`^[a-z-]+ var\(--t-[a-z]+\) (ease-out|linear|var\(--ease-[a-z]+\))$`)
+	onTheScale := regexp.MustCompile(`^[a-z-]+ var\(--t-[a-z]+\) (ease-out|linear|var\(--ease-[a-z]+\)|var\(--spring\))$`)
 	found := transitions(css)
 	require.Greater(t, len(found), 15, "the stylesheet's transitions")
 	for _, one := range found {
@@ -166,4 +196,106 @@ func TestMotion_NothingElseAnimatesLayout(t *testing.T) {
 		}
 	}
 	assert.Equal(t, layoutMoves, seen)
+}
+
+// TestMotion_LargerMovesTakeLonger: something coming in takes longer than a
+// chip changing, a whole page longer than that, and nothing is slow enough to
+// wait for.
+func TestMotion_LargerMovesTakeLonger(t *testing.T) {
+	css := builtStylesheet(t)
+	state, enter, page, move := motionTime(t, css, "--t-state"), motionTime(t, css, "--t-enter"), motionTime(t, css, "--t-page"), motionTime(t, css, "--t-move")
+	assert.Less(t, state, enter)
+	assert.Less(t, enter, page)
+	assert.LessOrEqual(t, page, 500, "a page change is made all day")
+	assert.LessOrEqual(t, move, 700)
+}
+
+// TestMotion_TheSpringDoesNotBounce: what turns or lands comes to rest without
+// passing its place and coming back.
+func TestMotion_TheSpringDoesNotBounce(t *testing.T) {
+	css := builtStylesheet(t)
+	spring := regexp.MustCompile(`--spring:linear\(([^)]*)\)`).FindStringSubmatch(css)
+	require.NotNil(t, spring)
+	points := strings.Split(spring[1], ",")
+	require.Greater(t, len(points), 8)
+	last := 0.0
+	for _, point := range points {
+		at, err := strconv.ParseFloat(strings.TrimSpace(point), 64)
+		require.NoError(t, err)
+		assert.GreaterOrEqual(t, at, last, "it never turns back")
+		assert.LessOrEqual(t, at, 1.0, "it never passes where it is going")
+		last = at
+	}
+	assert.Equal(t, 1.0, last)
+	assert.Contains(t, css, "--spring:var(--ease-enter)", "a browser without linear() gets the entrance curve")
+
+	// The map's vehicle turns with it, and so does the arrow of a list that folds.
+	assert.Contains(t, ruleBody(t, css, ".veh-marker svg"), "transition:transform var(--t-move) var(--spring)")
+	assert.Contains(t, ruleBody(t, css, "button.list-group .icon"), "transition:transform var(--t-move) var(--spring)")
+}
+
+// TestMotion_APageChangeIsACrossFadeWithARise: the page that leaves fades, the
+// one that comes fades in and rises into place, and the menu and the bar on
+// top stay where they are. Nothing slides sideways.
+func TestMotion_APageChangeIsACrossFadeWithARise(t *testing.T) {
+	css := builtStylesheet(t)
+	wanted, always := whereMotionIsWanted(t, css)
+
+	assert.Contains(t, wanted, "@view-transition{navigation:auto}")
+	assert.NotContains(t, always, "view-transition", "a page just loads for someone who asked for less motion")
+	for _, kept := range []string{"rail", "topbar", "tabbar", "page"} {
+		assert.Contains(t, wanted, "."+kept+"{view-transition-name:"+kept+"}")
+	}
+	assert.Contains(t, wanted, "::view-transition-old(page){animation:calc(var(--t-page) * .45) linear both vt-fade-out}")
+	assert.Contains(t, wanted, "::view-transition-new(page){animation:calc(var(--t-page) * .6) linear calc(var(--t-page) * .2) both vt-fade-in, var(--t-page) var(--ease-enter) both vt-rise}")
+	assert.Contains(t, css, "@keyframes vt-rise{0%{transform:translateY(12px)}}")
+
+	frames := regexp.MustCompile(`@keyframes vt-[a-z-]+\{(?:[^{}]*\{[^{}]*\})*\}`).FindAllString(css, -1)
+	require.Len(t, frames, 3, "the fade out, the fade in and the rise")
+	for _, frame := range frames {
+		assert.NotContains(t, frame, "translateX", "%s moves the page sideways", frame)
+	}
+}
+
+// TestMotion_ThingsComeInOnOneCurve: a card, a dialog, the search and the rows
+// of a list all arrive in the same time on the same curve, and a list's rows
+// follow each other 40 ms apart, to at most 200 ms.
+func TestMotion_ThingsComeInOnOneCurve(t *testing.T) {
+	wanted, _ := whereMotionIsWanted(t, builtStylesheet(t))
+	for _, rule := range []string{
+		".rise>*{animation:rise-in var(--t-enter) var(--ease-enter) both}",
+		".float-in{animation:rise-in var(--t-enter) var(--ease-enter) both}",
+		"dialog.dialog[open],dialog.palette[open]{animation:rise-in var(--t-enter) var(--ease-enter) both}",
+		"dialog[open]::backdrop{animation:fade-in var(--t-enter) linear both}",
+		".rise>:nth-child(2){animation-delay:40ms}",
+		".rise>:nth-child(5){animation-delay:.16s}",
+		".rise>:nth-child(n+6){animation-delay:.2s}",
+	} {
+		assert.Contains(t, wanted, rule)
+	}
+}
+
+// TestMotion_OnlyWhereMotionIsWanted: someone who asked their computer for
+// less motion sees every change and none of the travel. Outside the rules for
+// everyone else, these are the only animations: the script plays the first
+// two only where motion is wanted, the next is the 1 ms that shows the line
+// along the top with no growth, and the last two are switched off by name.
+func TestMotion_OnlyWhereMotionIsWanted(t *testing.T) {
+	_, always := whereMotionIsWanted(t, builtStylesheet(t))
+	played := map[string]bool{}
+	for _, rule := range regexp.MustCompile(`([^{}]+)\{[^{}]*?animation:([^;}]*)`).FindAllStringSubmatch(always, -1) {
+		if rule[2] != "none" {
+			played[rule[1]] = true
+		}
+	}
+	assert.Equal(t, map[string]bool{
+		".pulse.beat .arc-1": true, ".pulse.beat .arc-2": true,
+		"html.waiting:after": true,
+		".skeleton":          true, ".veh-marker.heard .veh-ring": true,
+	}, played)
+	assert.Regexp(t, `@media \(prefers-reduced-motion:reduce\)\{[^@]*\.veh-marker\.heard \.veh-ring,\.skeleton\{animation:none\}`, always)
+
+	script, err := fs.ReadFile(files, "web/static/js/app.js")
+	require.NoError(t, err)
+	assert.Contains(t, string(script), `if (!reduce) { pulse.classList.remove("beat"); void pulse.offsetWidth; pulse.classList.add("beat"); }`)
 }

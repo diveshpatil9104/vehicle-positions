@@ -63,22 +63,18 @@
   /* Motion. A small change made often is short; a larger one takes longer and lands softly. */
   --t-hover: 140ms;
   --t-state: 220ms;
-  --t-out: 90ms;
-  --t-in: 210ms;
-  --t-switch: 300ms;
+  --t-enter: 340ms;
+  --t-page: 420ms;
+  --t-move: 520ms;
   --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-emph: cubic-bezier(0.05, 0.7, 0.1, 1);
-  --ease-std: cubic-bezier(0.2, 0, 0, 1);
-  --spring: cubic-bezier(0.2, 0, 0, 1);
-  --spring-pop: cubic-bezier(0.2, 0, 0, 1);
+  --spring: var(--ease-enter);
   --rail: 232px;
 }
 
 @supports (transition-timing-function: linear(0, 1)) {
   :root {
-    /* Material's springs as the apps use them (Motion.kt): spatial 0.9/700, and the bouncier 0.6/800 for small things landing. */
-    --spring: linear(0, 0.081, 0.248, 0.428, 0.588, 0.716, 0.813, 0.881, 0.928, 0.959, 0.978, 0.989, 0.996, 0.999, 1.001, 1.001, 1);
-    --spring-pop: linear(0, 0.112, 0.352, 0.611, 0.827, 0.976, 1.06, 1.092, 1.091, 1.071, 1.047, 1.024, 1.007, 0.997, 0.992, 0.991, 0.995, 0.999, 1);
+    /* A spring that comes to rest without a bounce, for what turns or lands: critically damped, sampled until it is still. */
+    --spring: linear(0, 0.11, 0.31, 0.503, 0.657, 0.771, 0.85, 0.904, 0.939, 0.962, 0.976, 0.985, 0.991, 0.994, 0.997, 0.998, 1);
   }
 }
 
@@ -201,23 +197,23 @@
   [hidden] { display: none !important; }
 }
 
-/* Page changes: the apps' shared axis (a 30 px slide under a 90 ms out, 210 ms in cross-fade). The rail and
-   top bar keep their names so they stay put. Browsers without cross-document view transitions just load. */
+/* Page changes: the page that leaves fades out while the one that comes fades in and rises 12 px into place.
+   The rail and top bar keep their names so they stay put. Browsers without cross-document view transitions
+   just load. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
   .rail { view-transition-name: rail; }
   .topbar { view-transition-name: topbar; }
   .tabbar { view-transition-name: tabbar; }
   .page { view-transition-name: page; }
-  ::view-transition-old(page) { animation: var(--t-out) linear both vt-fade-out, var(--t-switch) var(--ease-emph) both vt-slide-out; }
-  ::view-transition-new(page) { animation: var(--t-in) linear var(--t-out) both vt-fade-in, var(--t-switch) var(--ease-emph) both vt-slide-in; }
-  ::view-transition-group(rail), ::view-transition-group(topbar), ::view-transition-group(tabbar) { animation-duration: var(--t-in); }
+  ::view-transition-old(page) { animation: calc(var(--t-page) * 0.45) linear both vt-fade-out; }
+  ::view-transition-new(page) { animation: calc(var(--t-page) * 0.6) linear calc(var(--t-page) * 0.2) both vt-fade-in, var(--t-page) var(--ease-enter) both vt-rise; }
+  ::view-transition-group(rail), ::view-transition-group(topbar), ::view-transition-group(tabbar) { animation-duration: var(--t-state); }
 }
 @keyframes vt-fade-out { to { opacity: 0; } }
 @keyframes vt-fade-in { from { opacity: 0; } }
-@keyframes vt-slide-out { to { transform: translateX(-30px); } }
-@keyframes vt-slide-in { from { transform: translateX(30px); } }
-@keyframes rise-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes vt-rise { from { transform: translateY(12px); } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(12px); } }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes pop-in { from { opacity: 0; transform: scale(0.5); } }
 @keyframes ring-out { from { opacity: 0.55; transform: scale(0.55); } to { opacity: 0; transform: scale(2.7); } }
@@ -257,7 +253,7 @@
   .pic .n { display: inline-grid; }
   .pic .n b { grid-area: 1 / 1; font-weight: 500; }
   @media (prefers-reduced-motion: no-preference) {
-    .pic.play .veh { animation: pic-glide 2400ms var(--ease-emph) 500ms both; }
+    .pic.play .veh { animation: pic-glide 2400ms var(--ease-enter) 500ms both; }
     .pic.play .disc { animation: pic-live 300ms linear 500ms both; }
     .pic.play .ring.go { animation: ring-out 1500ms ease-out both; }
     .pic.play .ring.g1 { animation-delay: 500ms; }
@@ -265,7 +261,7 @@
     .pic.play .ring.g3 { animation-delay: 1500ms; }
     .pic.play .ring.still1, .pic.play .ring.still2 { animation: fade-in 400ms linear 3400ms backwards; }
     .pic.play .riders { animation: pic-lit 300ms linear 1200ms both; }
-    .pic.play .chip-heard { animation: rise-in 350ms var(--ease-emph) 1500ms both; }
+    .pic.play .chip-heard { animation: rise-in 350ms var(--ease-enter) 1500ms both; }
     .pic.play .n b:nth-child(1) { animation: pic-n1 1ms linear 2200ms forwards; }
     .pic.play .n b:nth-child(2) { opacity: 0; animation: pic-n2 700ms steps(1) 2200ms forwards; }
     .pic.play .n b:nth-child(3) { opacity: 0; animation: pic-n3 1ms linear 2900ms forwards; }
@@ -606,8 +602,8 @@
   .pulse-mark circle { fill: currentColor; }
   .pulse[data-state="stale"] .pulse-mark, .pulse[data-state="idle"] .pulse-mark { color: var(--nodata); }
   .pulse[data-state="stale"] .pulse-age { color: var(--warn-text); font-weight: 500; }
-  .pulse.beat .arc-1 { animation: fade-in 300ms var(--ease-std) both; }
-  .pulse.beat .arc-2 { animation: fade-in 300ms 120ms var(--ease-std) both; }
+  .pulse.beat .arc-1 { animation: fade-in 300ms var(--ease-enter) both; }
+  .pulse.beat .arc-2 { animation: fade-in 300ms 120ms var(--ease-enter) both; }
 
   /* Buttons */
   .btn {
@@ -624,7 +620,7 @@
   .going { background-image: linear-gradient(var(--pressed), var(--pressed)); }
   html.waiting::after { content: ""; position: fixed; z-index: 700; left: 0; top: 0; width: 100%; height: 3px; background: var(--primary); transform-origin: 0 50%; transform: scaleX(0); animation: wait-shown 1ms linear 150ms both; }
   @media (prefers-reduced-motion: no-preference) {
-    html.waiting::after { animation: wait-line 8s var(--ease-emph) 150ms both; }
+    html.waiting::after { animation: wait-line 8s var(--ease-enter) 150ms both; }
   }
   .btn-primary { background: var(--primary); color: var(--on-primary); }
   .btn-primary:hover { background: color-mix(in srgb, var(--primary) 90%, var(--ink)); box-shadow: var(--shadow-1); }
@@ -849,7 +845,7 @@
   .list-group { display: flex; align-items: center; gap: 8px; width: 100%; height: 36px; padding: 0 16px; font: 500 13px/20px var(--font-sans); color: var(--ink-2); border: 0; border-top: 1px solid var(--line); position: sticky; top: 0; background: var(--surface); z-index: 1; text-align: left; }
   button.list-group { cursor: pointer; }
   button.list-group:hover { background: var(--surface-2); }
-  button.list-group .icon { transition: transform var(--t-switch) var(--ease-emph); }
+  button.list-group .icon { transition: transform var(--t-move) var(--spring); }
   button.list-group[aria-expanded="true"] .icon { transform: rotate(180deg); }
   .list-row { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 4px 16px 4px 46px; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
   .list-row:hover { background: var(--surface-2); }
@@ -879,7 +875,7 @@
   .kv dt { font-size: 12px; line-height: 16px; color: var(--ink-3); }
   .kv dd { margin: 0; font: 500 14px/20px var(--font-sans); }
   .veh-marker { position: relative; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--veh-fill); border: 2.5px solid var(--map-vehicle-edge); box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 2px 6px rgb(0 0 0 / 0.22); }
-  .veh-marker svg { width: 16px; height: 16px; fill: var(--veh-ink); transition: transform var(--t-switch) var(--ease-emph); }
+  .veh-marker svg { width: 16px; height: 16px; fill: var(--veh-ink); transition: transform var(--t-move) var(--spring); }
   .veh-marker.no-bearing svg { display: none; }
   .veh-marker.no-bearing::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--veh-ink); }
   .veh-marker.quiet svg { fill: #fff; }
@@ -919,20 +915,20 @@
   /* Motion helpers. Everything plays once, from a visible resting state, and only moves transform and opacity. */
   .count-up { display: inline-block; }
   @media (prefers-reduced-motion: no-preference) {
-    .rise > * { animation: rise-in 350ms var(--ease-emph) both; }
+    .rise > * { animation: rise-in var(--t-enter) var(--ease-enter) both; }
     .rise > *:nth-child(2) { animation-delay: 40ms; }
     .rise > *:nth-child(3) { animation-delay: 80ms; }
     .rise > *:nth-child(4) { animation-delay: 120ms; }
     .rise > *:nth-child(5) { animation-delay: 160ms; }
     .rise > *:nth-child(n + 6) { animation-delay: 200ms; }
-    .pop { animation: pop-in 450ms var(--spring-pop) both; }
-    .draw-in { stroke-dasharray: 1; animation: draw 700ms var(--ease-emph) both; }
-    .grow-y > * { transform-box: fill-box; transform-origin: bottom; animation: grow-y 500ms var(--ease-emph) both; }
-    .grow-x > i { animation: grow-x 500ms var(--ease-emph) both; }
-    .float-in { animation: rise-in var(--t-switch) var(--ease-emph) both; }
-    .tone-in { animation: tone 1200ms var(--ease-std) both; }
-    dialog.dialog[open], dialog.palette[open] { animation: rise-in var(--t-in) var(--ease-emph) both; }
-    dialog[open]::backdrop { animation: fade-in var(--t-in) linear both; }
+    .pop { animation: pop-in var(--t-move) var(--spring) both; }
+    .draw-in { stroke-dasharray: 1; animation: draw 700ms var(--ease-enter) both; }
+    .grow-y > * { transform-box: fill-box; transform-origin: bottom; animation: grow-y var(--t-move) var(--ease-enter) both; }
+    .grow-x > i { animation: grow-x var(--t-move) var(--ease-enter) both; }
+    .float-in { animation: rise-in var(--t-enter) var(--ease-enter) both; }
+    .tone-in { animation: tone 1200ms var(--ease-enter) both; }
+    dialog.dialog[open], dialog.palette[open] { animation: rise-in var(--t-enter) var(--ease-enter) both; }
+    dialog[open]::backdrop { animation: fade-in var(--t-enter) linear both; }
   }
   @media (prefers-reduced-motion: reduce) {
     .leaflet-container .leaflet-marker-icon.veh-icon, .veh-marker svg, .the-line .veh { transition: none !important; }
