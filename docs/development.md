@@ -166,6 +166,24 @@ that is shown (`fetchedAhead` in `admin_session.go`). A download under
 `/admin/` is not a page, and the rule has to leave it out:
 `TestShell_FetchesPagesAheadButNotDownloads` fails on a new one until it does.
 
+Motion in the admin takes its time and its curve from a short scale at the
+top of `web/styles/input.css`: `--t-hover` for a hover or a press,
+`--t-state` for a chip or a toggle, `--t-enter` and `--t-exit` for something
+coming in or going out, `--t-page` for a page change and `--t-move` for
+something that turns or lands, with `--ease-enter`, `--ease-exit` and
+`--spring` for the curves. Use these, not a time written out, and animate
+only `transform`, `opacity` or a colour:
+`TestMotion_EveryTransitionIsOnTheScale` and
+`TestMotion_NothingElseAnimatesLayout` fail otherwise. An entrance or an exit
+goes inside the `prefers-reduced-motion: no-preference` block, so someone who
+asked their computer for less motion sees the change without the travel. To
+have something fade out, hide it with the `hidden` attribute and give it the
+exit transition, as `.toast` has; taking it out of the page leaves nothing to
+fade. Bring it in with a transition from `@starting-style` too, not with
+keyframes: Chrome starts no transition on a property that a keyframe
+animation has been holding, so it would vanish when closed
+(`TestMotion_NothingThatLeavesIsHeldByKeyframes`).
+
 Running behind a reverse proxy locally (rare, but if you're testing that
 path)? Set `TRUST_PROXY_HEADERS=true` so client-IP-based rate limiting and
 the session cookie's `Secure` flag look at `X-Forwarded-For` /
