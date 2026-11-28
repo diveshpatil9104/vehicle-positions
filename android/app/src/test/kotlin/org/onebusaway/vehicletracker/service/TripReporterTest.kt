@@ -174,14 +174,20 @@ class TripReporterTest {
         server.shutdown()
     }
 
-    @Test fun `429 is dropped silently`() = runTest {
+    // A 429 says nothing about the server either way, so a server error the driver is already shown stays shown.
+    @Test fun `429 is dropped and keeps the status as it was`() = runTest {
         val server = MockWebServer().apply { start() }
+        server.enqueue(MockResponse().setResponseCode(500).setBody("""{"error":"internal"}"""))
         server.enqueue(MockResponse().setResponseCode(429).setBody("""{"error":"rate limit exceeded"}"""))
         val (reporter, tracking) = reporterWith(server)
 
         reporter.report(trip, fix())
+        assertEquals(TrackingProblem.SERVER_ERROR, tracking.state.value.problem)
 
-        assertEquals(TrackingProblem.NONE, tracking.state.value.problem)
+        reporter.report(trip, fix())
+
+        assertEquals("the 429 reached the server", 2, server.requestCount)
+        assertEquals(TrackingProblem.SERVER_ERROR, tracking.state.value.problem)
         assertEquals(0, tracking.state.value.fixesSent)
         server.shutdown()
     }
