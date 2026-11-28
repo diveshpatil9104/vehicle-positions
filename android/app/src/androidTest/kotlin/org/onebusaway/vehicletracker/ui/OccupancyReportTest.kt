@@ -36,6 +36,7 @@ import org.onebusaway.vehicletracker.data.FileTripGeometryStore
 import org.onebusaway.vehicletracker.data.KeystoreCryptor
 import org.onebusaway.vehicletracker.data.TrackingRepository
 import org.onebusaway.vehicletracker.data.TripRepository
+import org.onebusaway.vehicletracker.data.TripSettings
 import org.onebusaway.vehicletracker.data.WaitingReports
 import org.onebusaway.vehicletracker.data.api.ApiFactory
 import org.onebusaway.vehicletracker.data.api.TrackerApiProvider
@@ -109,7 +110,7 @@ class OccupancyReportTest {
         val ender = TripEnder(tripRepository, trips, geometry, NoService, sessions)
         val waiting = WaitingReports(queue, sessions, clock = { System.currentTimeMillis() / 1000 })
         val viewModel = TrackingViewModel(TrackingRepository(), trips, ender, NoMapFile, waiting)
-        compose.setContent { TrackingScreen(onTripEnded = {}, onReauthRequired = {}, viewModel = viewModel) }
+        compose.setContent { TrackingScreen(onTripEnded = {}, onReauthRequired = {}, viewModel = viewModel, tripSettings = TripSettings()) }
         compose.waitUntil(TIMEOUT_SEC * 1000) { viewModel.uiState.value.activeTrip != null }
 
         assertFalse("nothing chosen yet", send(reporter).containsKey("occupancy_status"))

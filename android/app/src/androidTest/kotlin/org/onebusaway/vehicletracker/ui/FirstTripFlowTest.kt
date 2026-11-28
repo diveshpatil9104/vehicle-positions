@@ -61,6 +61,7 @@ import org.onebusaway.vehicletracker.data.KeystoreCryptor
 import org.onebusaway.vehicletracker.data.TrackingRepository
 import org.onebusaway.vehicletracker.data.TrackingState
 import org.onebusaway.vehicletracker.data.TripRepository
+import org.onebusaway.vehicletracker.data.TripSettings
 import org.onebusaway.vehicletracker.data.WaitingReports
 import org.onebusaway.vehicletracker.data.api.ApiFactory
 import org.onebusaway.vehicletracker.data.api.TrackerApiProvider
@@ -241,6 +242,7 @@ class FirstTripFlowTest {
                                 val ender = TripEnder(tripRepository, trips, geometry, NoReportsService, sessions)
                                 TrackingViewModel(tracking, trips, ender, NoStreetMap, WaitingReports(FileOfflineFixQueue(queueFile), sessions, clock))
                             },
+                            tripSettings = TripSettings(),
                             sentCountTip = viewModel { SentCountTipViewModel(tips, tracking) },
                         )
                     }
