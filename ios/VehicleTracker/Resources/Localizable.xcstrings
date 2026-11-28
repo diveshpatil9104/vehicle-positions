@@ -1245,6 +1245,12 @@
             "value" : "%1$@ እስከ %2$@ · መኪና %3$@"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "من %1$@ إلى %2$@ · المركبة %3$@"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -1261,6 +1267,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "De %1$@ a %2$@ · Vehículo %3$@"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%1$@ تا %2$@ · خودروی %3$@"
           }
         },
         "fi" : {
@@ -8434,6 +8446,12 @@
             "value" : "ጉዞን ከጨረሱ በኋላ እዚህ ይታያል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تظهر الرحلة هنا بعد أن تنهيها."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -8444,6 +8462,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Un viaje aparece aquí cuando lo finalizas."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سفر پس از اینکه آن را پایان دهید، اینجا نمایش داده می‌شود."
           }
         },
         "fi" : {
@@ -8768,6 +8792,12 @@
             "value" : "መለያ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الحساب"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -8778,6 +8808,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Cuenta"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "حساب"
           }
         },
         "fi" : {
@@ -9275,6 +9311,12 @@
             "value" : "ሁሉም ተፈቅዷል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "كلها مسموح بها"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -9285,6 +9327,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Todo permitido"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "همه مجازند"
           }
         },
         "fi" : {
@@ -10894,6 +10942,12 @@
             "value" : "ሁልጊዜ ይበራል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مضاءة دائمًا"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -10904,6 +10958,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Siempre encendida"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "همیشه روشن"
           }
         },
         "fi" : {
@@ -11401,6 +11461,12 @@
             "value" : "መተግበሪያ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "التطبيق"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -11411,6 +11477,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "App"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "برنامه"
           }
         },
         "fi" : {
@@ -11562,6 +11634,12 @@
             "value" : "Apple በጉዞ ገጹ ላይ ካርታውን ይስላል። ሪፖርቶች በጭራሽ ወደ Apple አይላኩም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ترسم Apple الخريطة على شاشة التتبع. لا تُرسل التقارير إلى Apple أبدًا."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -11572,6 +11650,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Apple dibuja el mapa en la pantalla de seguimiento. Los reportes nunca van a Apple."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "نقشه صفحه ردیابی را Apple می‌کشد. گزارش‌ها هرگز به Apple ارسال نمی‌شوند."
           }
         },
         "fi" : {
@@ -11723,6 +11807,12 @@
             "value" : "Apple Maps"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Apple Maps"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -11730,6 +11820,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Apple Maps"
+          }
+        },
+        "fa" : {
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Apple Maps"
@@ -12576,6 +12672,12 @@
             "value" : "ቢያንስ 8 ቁምፊዎች"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "٨ أحرف على الأقل"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -12586,6 +12688,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Al menos 8 caracteres"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "حداقل ۸ کاراکتر"
           }
         },
         "fi" : {
@@ -13775,6 +13883,12 @@
             "value" : "ከ%@ ጋር መገናኘት አልተቻለም። ግንኙነትዎን ያረጋግጡ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تعذّر الوصول إلى %@. تحقق من اتصالك."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -13785,6 +13899,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "No se puede conectar con %@. Revisa tu conexión."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@ در دسترس نیست. اتصال اینترنت را بررسی کنید."
           }
         },
         "fi" : {
@@ -14455,6 +14575,12 @@
             "value" : "የይለፍ ቃል ይቀይሩ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تغيير كلمة المرور"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -14465,6 +14591,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Cambiar contraseña"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تغییر رمز عبور"
           }
         },
         "fi" : {
@@ -14789,6 +14921,12 @@
             "value" : "የይለፍ ቃል በመቀየር ላይ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "جارٍ تغيير كلمة المرور"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -14799,6 +14937,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Cambiando contraseña"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "در حال تغییر رمز عبور"
           }
         },
         "fi" : {
@@ -17033,6 +17177,12 @@
             "value" : "የይለፍ ቃልዎን መቀየር አልተቻለም። እንደገና ይሞክሩ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تعذّر تغيير كلمة مرورك. حاول مرة أخرى."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -17043,6 +17193,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "No se pudo cambiar tu contraseña. Inténtalo de nuevo."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تغییر رمز عبور انجام نشد. دوباره تلاش کنید."
           }
         },
         "fi" : {
@@ -17540,6 +17696,12 @@
             "value" : "ጉዞዎችዎን መጫን አልተቻለም"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تعذّر تحميل رحلاتك"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -17550,6 +17712,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "No se pudieron cargar tus viajes"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "بارگیری سفرهای شما انجام نشد"
           }
         },
         "fi" : {
@@ -18220,6 +18388,12 @@
             "value" : "የአሁኑ የይለፍ ቃል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "كلمة المرور الحالية"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -18230,6 +18404,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Contraseña actual"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "رمز عبور فعلی"
           }
         },
         "fi" : {
@@ -18381,6 +18561,12 @@
             "value" : "ጨለማ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "داكن"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -18391,6 +18577,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Oscuro"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تیره"
           }
         },
         "fi" : {
@@ -19407,6 +19599,12 @@
             "value" : "በጉዞ ጊዜ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "أثناء الرحلة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -19417,6 +19615,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Durante el viaje"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "در طول سفر"
           }
         },
         "fi" : {
@@ -24066,6 +24270,12 @@
             "value" : "ምን ያህል እንደሞላ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مدى امتلائها"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -24076,6 +24286,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Qué tan lleno va"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "خودرو چقدر پر است"
           }
         },
         "fi" : {
@@ -25611,6 +25827,12 @@
             "value" : "ቋንቋ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "اللغة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -25621,6 +25843,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Idioma"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "زبان"
           }
         },
         "fi" : {
@@ -26118,6 +26346,12 @@
             "value" : "ፈቃዶች"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "التراخيص"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -26128,6 +26362,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Licencias"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مجوزهای نرم‌افزار"
           }
         },
         "fi" : {
@@ -26279,6 +26519,12 @@
             "value" : "ብሩህ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "فاتح"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -26289,6 +26535,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Claro"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "روشن"
           }
         },
         "fi" : {
@@ -26959,6 +27211,12 @@
             "value" : "አካባቢ አልተፈቀደም"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع الجغرافي غير مسموح به"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -26969,6 +27227,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ubicación no permitida"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مکان مجاز نیست"
           }
         },
         "fi" : {
@@ -27120,6 +27384,12 @@
             "value" : "ለዚህ መተግበሪያ አካባቢ አልተፈቀደም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع الجغرافي غير مسموح به لهذا التطبيق."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -27130,6 +27400,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "La ubicación no está permitida para esta app."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مکان برای این برنامه مجاز نیست."
           }
         },
         "fi" : {
@@ -27281,6 +27557,12 @@
             "value" : "አካባቢ ጠፍቷል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع الجغرافي متوقف"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -27291,6 +27573,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ubicación desactivada"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مکان خاموش است"
           }
         },
         "fi" : {
@@ -27615,6 +27903,12 @@
             "value" : "ለመላው ስልኩ አካባቢ ጠፍቷል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع الجغرافي متوقف للهاتف كله."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -27625,6 +27919,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "La ubicación está desactivada en todo el teléfono."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مکان برای کل گوشی خاموش است."
           }
         },
         "fi" : {
@@ -28641,6 +28941,12 @@
             "value" : "ካርታ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الخريطة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -28651,6 +28957,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Mapa"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "نقشه"
           }
         },
         "fi" : {
@@ -28802,6 +29114,12 @@
             "value" : "ተጨማሪ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "المزيد"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -28812,6 +29130,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Más"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "بیشتر"
           }
         },
         "fi" : {
@@ -28963,6 +29287,12 @@
             "value" : "የእኔ ጉዞዎች"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "رحلاتي"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -28973,6 +29303,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Mis viajes"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سفرهای من"
           }
         },
         "fi" : {
@@ -29124,6 +29460,12 @@
             "value" : "አዲስ የይለፍ ቃል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "كلمة المرور الجديدة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -29134,6 +29476,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Contraseña nueva"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "رمز عبور جدید"
           }
         },
         "fi" : {
@@ -29285,6 +29633,12 @@
             "value" : "አዲሱን የይለፍ ቃል እንደገና"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "كلمة المرور الجديدة مرة أخرى"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -29295,6 +29649,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Confirmar contraseña nueva"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تکرار رمز عبور جدید"
           }
         },
         "fi" : {
@@ -30144,6 +30504,12 @@
             "value" : "ግንኙነት የለም፣ GPS የለም፣ ወይም ከመለያ ወጥተዋል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لا يوجد اتصال، لا يوجد GPS، أو تم تسجيل الخروج"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -30154,6 +30520,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Sin conexión, sin GPS o sesión cerrada"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "قطع اینترنت، نبود GPS یا خروج از حساب"
           }
         },
         "fi" : {
@@ -31343,6 +31715,12 @@
             "value" : "እስካሁን ጉዞ የለም"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لا توجد رحلات بعد"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -31353,6 +31731,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Aún no hay viajes"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "هنوز سفری نیست"
           }
         },
         "fi" : {
@@ -31850,6 +32234,12 @@
             "value" : "ሰሜን ወደ ላይ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الشمال للأعلى"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -31860,6 +32250,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Norte arriba"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "شمال به بالا"
           }
         },
         "fi" : {
@@ -32184,6 +32580,12 @@
             "value" : "ገና አልተጠየቀም"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لم يُطلب بعد"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -32194,6 +32596,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Aún no se solicitó"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "هنوز درخواست نشده"
           }
         },
         "fi" : {
@@ -32691,6 +33099,12 @@
             "value" : "ሪፖርት ለመላክ ዝግጁ አይደለም"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "غير جاهز للإرسال"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -32701,6 +33115,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "No está listo para reportar"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "آماده گزارش‌دهی نیست"
           }
         },
         "fi" : {
@@ -34236,6 +34656,12 @@
             "value" : "በባትሪ ሲሰራ እንደተለመደው ይጠፋል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "عند العمل بالبطارية تنطفئ كالمعتاد"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -34246,6 +34672,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Con batería se apaga como siempre"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "با باتری، طبق معمول خاموش می‌شود"
           }
         },
         "fi" : {
@@ -34743,6 +35175,12 @@
             "value" : "ቻርጅ ላይ ሳለ ይበራል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مضاءة أثناء الشحن"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -34753,6 +35191,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Encendida mientras carga"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "هنگام شارژ روشن"
           }
         },
         "fi" : {
@@ -35250,6 +35694,12 @@
             "value" : "በጉዞ ጊዜ ብቻ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "أثناء الرحلة فقط"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -35260,6 +35710,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Solo durante un viaje"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "فقط در طول سفر"
           }
         },
         "fi" : {
@@ -35411,6 +35867,12 @@
             "value" : "በጉዞ ገጹ ላይ ከገለጹ ብቻ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "فقط إذا حددته على شاشة التتبع."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -35421,6 +35883,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Solo si lo indicas en la pantalla de seguimiento."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "فقط اگر خودتان در صفحه ردیابی اعلام کنید."
           }
         },
         "fi" : {
@@ -36264,6 +36732,12 @@
             "value" : "በአሳሹ ውስጥ ይከፈታል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تُفتح في المتصفح"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -36274,6 +36748,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Se abre en el navegador"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "در مرورگر باز می‌شود"
           }
         },
         "fi" : {
@@ -36598,6 +37078,12 @@
             "value" : "በእርስዎ መለያ የገቡ ሌሎች ስልኮች ከመለያ ይወጣሉ። ይህኛው እንደገባ ይቆያል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "يُسجَّل خروج الهواتف الأخرى المسجّل دخولها باسمك. ويبقى هذا الهاتف مسجّل الدخول."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -36608,6 +37094,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Se cierra la sesión en los otros teléfonos con tu cuenta. En este, la sesión sigue iniciada."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "گوشی‌های دیگری که با حساب شما وارد شده‌اند، از حساب خارج می‌شوند. این گوشی وارد حساب باقی می‌ماند."
           }
         },
         "fi" : {
@@ -36759,6 +37251,12 @@
             "value" : "ሌሎች ስልኮች ከመለያ ወጥተዋል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تم تسجيل خروج الهواتف الأخرى."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -36769,6 +37267,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Se cerró la sesión en los otros teléfonos."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "گوشی‌های دیگر از حساب خارج شدند."
           }
         },
         "fi" : {
@@ -37093,6 +37597,12 @@
             "value" : "የይለፍ ቃሉ ተቀይሯል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تم تغيير كلمة المرور"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -37103,6 +37613,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Contraseña cambiada"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "رمز عبور تغییر کرد"
           }
         },
         "fi" : {
@@ -37254,6 +37770,12 @@
             "value" : "የፈቃድ ፍተሻ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "فحص الأذونات"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -37264,6 +37786,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Revisión de permisos"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "بررسی مجوزها"
           }
         },
         "fi" : {
@@ -37934,6 +38462,12 @@
             "value" : "ቦታ፣ ትክክለኛነቱ፣ ፍጥነት፣ አቅጣጫ እና ሰዓት፣ ከመኪናው እና ከዙሩ ጋር።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع ومدى دقته والسرعة والاتجاه والوقت، مع المركبة والدورة."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -37944,6 +38478,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "La ubicación, su precisión, la velocidad, la dirección y la hora, con el vehículo y la salida."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "موقعیت، میزان دقت آن، سرعت، جهت و زمان، همراه با خودرو و سرویس."
           }
         },
         "fi" : {
@@ -38095,6 +38635,12 @@
             "value" : "ከ«ጉዞ ይጀምሩ» እስከ «ጉዞ ይጨርሱ» ያሉ ቦታዎች። ከዚያ በፊትም ሆነ በኋላ ምንም የለም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "المواقع من بدء الرحلة حتى إنهاء الرحلة. لا شيء قبل ذلك أو بعده."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -38105,6 +38651,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ubicaciones desde “Iniciar viaje” hasta “Finalizar viaje”. Nada de antes ni de después."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "موقعیت‌ها از «شروع سفر» تا «پایان سفر». نه قبل از آن، نه بعد از آن."
           }
         },
         "fi" : {
@@ -38429,6 +38981,12 @@
             "value" : "ትክክለኛ አካባቢ ጠፍቷል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع الدقيق متوقف"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -38439,6 +38997,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ubicación precisa desactivada"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مکان دقیق خاموش است"
           }
         },
         "fi" : {
@@ -38590,6 +39154,12 @@
             "value" : "ለዚህ መተግበሪያ ትክክለኛ አካባቢ ጠፍቷል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الموقع الدقيق متوقف لهذا التطبيق."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -38600,6 +39170,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "La ubicación precisa está desactivada para esta app."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مکان دقیق برای این برنامه خاموش است."
           }
         },
         "fi" : {
@@ -39097,6 +39673,12 @@
             "value" : "ግላዊነት"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الخصوصية"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -39107,6 +39689,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Privacidad"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "حریم خصوصی"
           }
         },
         "fi" : {
@@ -39604,6 +40192,12 @@
             "value" : "ሪፖርት ለመላክ ዝግጁ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "جاهز للإرسال"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -39614,6 +40208,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Listo para reportar"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "آماده گزارش‌دهی"
           }
         },
         "fi" : {
@@ -43144,6 +43744,12 @@
             "value" : "ግንኙነት የሚጠብቁ ሪፖርቶች"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "التقارير دون اتصال"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -43154,6 +43760,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Reportes sin conexión"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "گزارش‌های بدون اتصال"
           }
         },
         "fi" : {
@@ -43997,6 +44609,12 @@
             "value" : "ተሳፋሪዎች"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الركاب"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -44007,6 +44625,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Pasajeros"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مسافران"
           }
         },
         "fi" : {
@@ -48547,6 +49171,12 @@
             "value" : "ስክሪን"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الشاشة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -48557,6 +49187,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Pantalla"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "صفحه نمایش"
           }
         },
         "fi" : {
@@ -48708,6 +49344,12 @@
             "value" : "ስክሪኑ ሁልጊዜ ይበራል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الشاشة مضاءة دائمًا"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -48718,6 +49360,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Pantalla siempre encendida"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "صفحه همیشه روشن می‌ماند"
           }
         },
         "fi" : {
@@ -48869,6 +49517,12 @@
             "value" : "ቻርጅ ላይ ሳለ ስክሪኑ ይበራል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الشاشة مضاءة أثناء الشحن"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -48879,6 +49533,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Pantalla encendida mientras carga"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "صفحه هنگام شارژ روشن می‌ماند"
           }
         },
         "fi" : {
@@ -49722,6 +50382,12 @@
             "value" : "ገብተው ሳሉ ግንኙነት ሲመለስ ይላካሉ። ከአንድ ቀን በኋላ አሁንም እዚህ ያሉት ይሰረዛሉ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تُرسل عند عودة الاتصال، ما دمت مسجّل الدخول. وما يبقى منها هنا بعد يوم يُحذف."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -49732,6 +50398,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Se envían cuando vuelve la conexión, mientras tengas la sesión iniciada. Los que sigan aquí después de un día se descartan."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "وقتی اتصال برگردد، تا زمانی که وارد حساب هستید، ارسال می‌شوند. هر کدام که پس از یک روز هنوز اینجا باشد، حذف می‌شود."
           }
         },
         "fi" : {
@@ -50921,6 +51593,12 @@
             "value" : "ቅንብሮች"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الإعدادات"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -50931,6 +51609,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Configuración"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تنظیمات"
           }
         },
         "fi" : {
@@ -54023,6 +54707,12 @@
             "value" : "ጉዞ ሲጀምሩ ተሳፋሪዎች መኪናዎን ያያሉ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ابدأ رحلة ليرى الركاب مركبتك."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -54033,6 +54723,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Inicia un viaje y los pasajeros ven tu vehículo."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سفر را شروع کنید تا مسافران خودروی شما را ببینند."
           }
         },
         "fi" : {
@@ -58888,6 +59584,12 @@
             "value" : "ስርዓት"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "النظام"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -58898,6 +59600,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Sistema"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سیستم"
           }
         },
         "fi" : {
@@ -59914,6 +60622,12 @@
             "value" : "ያ የአሁኑ የይለፍ ቃልዎ አይደለም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "هذه ليست كلمة مرورك الحالية."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -59924,6 +60638,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Esa no es tu contraseña actual."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "این رمز عبور فعلی شما نیست."
           }
         },
         "fi" : {
@@ -60075,6 +60795,12 @@
             "value" : "ጉዞ ሲጀምሩ መተግበሪያው የአካባቢ ፈቃድ ይጠይቃል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "يطلب التطبيق الوصول إلى الموقع الجغرافي عندما تبدأ رحلة."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -60085,6 +60811,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "La app pide acceso a la ubicación cuando inicias un viaje."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "برنامه وقتی سفر را شروع کنید، دسترسی به مکان را درخواست می‌کند."
           }
         },
         "fi" : {
@@ -60582,6 +61314,12 @@
             "value" : "መተግበሪያው ሌሎች ላይብረሪዎችን ወይም ቅርጸ-ቁምፊዎችን አይጠቀምም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لا يستخدم التطبيق أي مكتبات أو خطوط أخرى."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -60592,6 +61330,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "La app no usa otras bibliotecas ni fuentes."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "برنامه از هیچ کتابخانه یا فونت دیگری استفاده نمی‌کند."
           }
         },
         "fi" : {
@@ -60743,6 +61487,12 @@
             "value" : "ከመለያ ሲወጡ ኢሜይሉ ይወገዳል። ሰርቨሩ ይቀራል።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "يُزال البريد الإلكتروني عند تسجيل الخروج. ويبقى الخادم."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -60753,6 +61503,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "El correo se borra cuando cierras sesión. El servidor se queda."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ایمیل با خروج از حساب پاک می‌شود. سرور می‌ماند."
           }
         },
         "fi" : {
@@ -62634,6 +63390,12 @@
             "value" : "የገቡበት ሰርቨር፣ %@።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الخادم الذي سجّلت الدخول إليه، %@."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -62644,6 +63406,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "El servidor en el que iniciaste sesión, %@."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سروری که در آن وارد شده‌اید، %@."
           }
         },
         "fi" : {
@@ -62795,6 +63563,12 @@
             "value" : "የገቡበት ሰርቨር።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الخادم الذي سجّلت الدخول إليه."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -62805,6 +63579,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "El servidor en el que iniciaste sesión."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سروری که در آن وارد شده‌اید."
           }
         },
         "fi" : {
@@ -63129,6 +63909,12 @@
             "value" : "ሁለቱ አዲስ የይለፍ ቃላት አይዛመዱም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "كلمتا المرور الجديدتان غير متطابقتين."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -63139,6 +63925,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Las dos contraseñas nuevas no coinciden."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "دو رمز عبور جدید یکسان نیستند."
           }
         },
         "fi" : {
@@ -63290,6 +64082,12 @@
             "value" : "በሚነዱበት አቅጣጫ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "اتجاه قيادتك"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -63300,6 +64098,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Hacia donde manejas"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "جهت حرکت شما"
           }
         },
         "fi" : {
@@ -63451,6 +64255,12 @@
             "value" : "ገጽታ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "المظهر"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -63461,6 +64271,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Tema"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "طرح زمینه"
           }
         },
         "fi" : {
@@ -63958,6 +64774,12 @@
             "value" : "እስካሁን ሊያዩዎት አይችሉም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لا يمكنهم رؤيتك بعد."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -63968,6 +64790,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Todavía no te ven."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "هنوز نمی‌توانند شما را ببینند."
           }
         },
         "fi" : {
@@ -64119,6 +64947,12 @@
             "value" : "መኪናውን ያያሉ እንጂ እርስዎን አይደለም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "يرون المركبة، ولا يرونك أنت."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -64129,6 +64963,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ven el vehículo, no a ti."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "آن‌ها خودرو را می‌بینند، نه شما را."
           }
         },
         "fi" : {
@@ -64280,6 +65120,12 @@
             "value" : "በጉዞ ጊዜ መኪናዎን ያያሉ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "يرون مركبتك أثناء الرحلة."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -64290,6 +65136,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ven tu vehículo durante un viaje."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "در طول سفر خودروی شما را می‌بینند."
           }
         },
         "fi" : {
@@ -64787,6 +65639,12 @@
             "value" : "ይህ iPhone መተግበሪያዎች አካባቢን እንዲጠቀሙ አይፈቅድም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لا يسمح جهاز iPhone هذا للتطبيقات باستخدام الموقع الجغرافي."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -64797,6 +65655,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Este iPhone no permite que las apps usen la ubicación."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "این iPhone اجازه نمی‌دهد برنامه‌ها از مکان استفاده کنند."
           }
         },
         "fi" : {
@@ -65294,6 +66158,12 @@
             "value" : "ይህ ስልክ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "هذا الهاتف"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -65304,6 +66174,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Este teléfono"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "این گوشی"
           }
         },
         "fi" : {
@@ -66147,6 +67023,12 @@
             "value" : "ዛሬ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "اليوم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -66157,6 +67039,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Hoy"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "امروز"
           }
         },
         "fi" : {
@@ -67698,6 +68586,12 @@
             "value" : "አጠር ያለ የይለፍ ቃል ይጠቀሙ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "استخدم كلمة مرور أقصر."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -67708,6 +68602,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Usa una contraseña más corta."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "رمز عبور کوتاه‌تری انتخاب کنید."
           }
         },
         "fi" : {
@@ -67859,6 +68759,12 @@
             "value" : "ቢያንስ 8 ቁምፊዎችን ይጠቀሙ።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "استخدم ٨ أحرف على الأقل."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -67869,6 +68775,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Usa al menos 8 caracteres."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "از حداقل ۸ کاراکتر استفاده کنید."
           }
         },
         "fi" : {
@@ -68539,6 +69451,12 @@
             "value" : "ተጨማሪ ባትሪ ይጠቀማል"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "تستهلك مزيدًا من البطارية"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -68549,6 +69467,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Usa más batería"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "باتری بیشتری مصرف می‌کند"
           }
         },
         "fi" : {
@@ -70283,6 +71207,12 @@
             "value" : "ሪፖርት መላክ ችግር ሲያጋጥመው ይንዘር"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "الاهتزاز عند حدوث مشكلة في الإرسال"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -70293,6 +71223,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Vibrar si hay un problema con los reportes"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لرزش هنگام مشکل در گزارش‌دهی"
           }
         },
         "fi" : {
@@ -70976,6 +71912,12 @@
             "value" : "የሚላከው"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ما يُرسل"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -70986,6 +71928,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Qué se envía"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "چه چیزی ارسال می‌شود"
           }
         },
         "fi" : {
@@ -71137,6 +72085,12 @@
             "value" : "በዚህ ስልክ ላይ የሚቀረው"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ما يبقى على هذا الهاتف"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -71147,6 +72101,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Qué queda en este teléfono"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "چه چیزی در این گوشی می‌ماند"
           }
         },
         "fi" : {
@@ -71298,6 +72258,12 @@
             "value" : "መተግበሪያው የመኪናዎን ሪፖርት ለመላክ የሚፈልገው።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ما يحتاج إليه التطبيق لإرسال تقارير مركبتك."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -71308,6 +72274,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Lo que la app necesita para enviar la ubicación de tu vehículo."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "آنچه برنامه برای گزارش‌دهی خودروی شما نیاز دارد."
           }
         },
         "fi" : {
@@ -71805,6 +72777,12 @@
             "value" : "መኪናው የት እንዳለ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "مكان المركبة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -71815,6 +72793,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Dónde está el vehículo"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "خودرو کجاست"
           }
         },
         "fi" : {
@@ -71966,6 +72950,12 @@
             "value" : "የሚቀበለው"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "من يتلقاه"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -71976,6 +72966,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Quién lo recibe"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "چه کسی دریافت می‌کند"
           }
         },
         "fi" : {
@@ -72473,6 +73469,12 @@
             "value" : "ትላንት"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "أمس"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -72483,6 +73485,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ayer"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "دیروز"
           }
         },
         "fi" : {
@@ -73153,6 +74161,12 @@
             "value" : "ድርጅትዎ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "جهة عملك"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -73163,6 +74177,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Tu empresa"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "شرکت شما"
           }
         },
         "fi" : {
@@ -73487,6 +74507,12 @@
             "value" : "የድርጅትዎ የግላዊነት መመሪያ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سياسة الخصوصية لجهة عملك"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -73497,6 +74523,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Política de privacidad de tu empresa"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سیاست حفظ حریم خصوصی شرکت شما"
           }
         },
         "fi" : {
@@ -73648,6 +74680,12 @@
             "value" : "የድርጅትዎ ሰርቨር እስካሁን የይለፍ ቃላትን መቀየር አይችልም።"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "لا يمكن لخادم جهة عملك تغيير كلمات المرور بعد."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -73658,6 +74696,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "El servidor de tu empresa todavía no puede cambiar contraseñas."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "سرور شرکت شما هنوز نمی‌تواند رمز عبور را تغییر دهد."
           }
         },
         "fi" : {
@@ -73982,6 +75026,12 @@
             "value" : "ኢሜይልዎ እና ሰርቨሩ"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "بريدك الإلكتروني والخادم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "machine_translated",
@@ -73992,6 +75042,12 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Tu correo y el servidor"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ایمیل شما و سرور"
           }
         },
         "fi" : {
