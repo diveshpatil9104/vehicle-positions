@@ -379,7 +379,7 @@
     <string name="tracking_occupancy_question">車内の混雑状況は？</string>
     <string name="tracking_occupancy_many_seats">空席あり</string>
     <string name="tracking_occupancy_few_seats">空席わずか</string>
-    <string name="tracking_occupancy_standing">立ち客あり</string>
+    <string name="tracking_occupancy_standing">立ち席のみ</string>
     <string name="tracking_occupancy_full">満員</string>
     <string name="tracking_occupancy_clear">選択を解除</string>
     <string name="tracking_fact_run">便</string>
