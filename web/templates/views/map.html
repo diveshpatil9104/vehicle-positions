@@ -8,7 +8,7 @@
   <div id="main-map" class="map" data-live-url="/api/v1/admin/vehicles/live" data-alerts-url="/api/v1/admin/alerts" data-gtfs-url="/api/v1/gtfs" data-quiet-after="{{.QuietAfter}}" data-window-early="{{.OnTimeEarly}}" data-window-late="{{.OnTimeLate}}"></div>
   <noscript><div class="float" style="position:absolute;left:16px;top:16px;z-index:600;padding:16px;max-width:360px">The live map needs JavaScript. <a href="/admin/trips">Trips</a> and <a href="/admin/alerts">Alerts</a> work without it.</div></noscript>
   <div class="map-chips js-only" id="map-chips" role="group" aria-label="Show vehicles by route"></div>
-  <aside class="map-list float float-in js-only" id="map-list" aria-label="Vehicles">
+  <aside class="map-list float js-only" id="map-list" aria-label="Vehicles">
     <div class="list-head"><span>Vehicles</span><span class="muted" id="map-count" style="font-weight:400;font-size:14px"></span><span style="flex:1"></span><button class="icon-btn" type="button" id="map-list-close" aria-label="Close the vehicle list">{{template "icon" "close"}}</button></div>
     <div class="list-body" id="fleet-list"><div class="skeletons"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></div>
   </aside>

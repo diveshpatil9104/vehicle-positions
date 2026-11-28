@@ -338,7 +338,6 @@
     if (phone.matches) setList(false);
     // The card answers the click at once; the pan follows on the next frame and the trip's line when the schedule answers.
     detail(v); shell.hidden = false;
-    shell.classList.remove("float-in"); void shell.offsetWidth; shell.classList.add("float-in");
     if (fromList && phone.matches) card.close.focus();
     $("map-said").textContent = v.label + ", " + card.word.textContent + ".";
     requestAnimationFrame(function () {

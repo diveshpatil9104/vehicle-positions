@@ -109,19 +109,21 @@ var pollGlides = []string{"left 10s linear", "transform 10s linear"}
 
 // TestMotion_EveryTransitionIsOnTheScale: a transition takes its time from the
 // scale and its curve from the scale or a plain keyword, so one edit retimes
-// the whole site and nothing drifts. A name the stylesheet uses must be one it
-// sets: a browser drops the whole declaration for a name that is not there,
-// and the change then happens with no motion at all.
+// the whole site and nothing drifts. Something that leaves is also kept drawn
+// for the time its exit takes. A name the stylesheet uses must be one it sets:
+// a browser drops the whole declaration for a name that is not there, and the
+// change then happens with no motion at all.
 func TestMotion_EveryTransitionIsOnTheScale(t *testing.T) {
 	css := builtStylesheet(t)
 	onTheScale := regexp.MustCompile(`^[a-z-]+ var\(--t-[a-z]+\) (ease-out|linear|var\(--ease-[a-z]+\)|var\(--spring\))$`)
+	keptDrawn := regexp.MustCompile(`^(display|overlay) var\(--t-exit\) allow-discrete$`)
 	found := transitions(css)
 	require.Greater(t, len(found), 15, "the stylesheet's transitions")
 	for _, one := range found {
 		if one == "none" || one == "none!important" || slices.Contains(pollGlides, one) {
 			continue
 		}
-		assert.Regexp(t, onTheScale, one)
+		assert.True(t, onTheScale.MatchString(one) || keptDrawn.MatchString(one), "%q is not on the scale", one)
 	}
 
 	set := map[string]bool{}
@@ -176,7 +178,8 @@ func TestMotion_NothingElseAnimatesLayout(t *testing.T) {
 	seen := map[string]bool{}
 	for _, one := range transitions(css) {
 		property := strings.Fields(strings.TrimSuffix(one, "!important"))[0]
-		if property == "none" {
+		// allow-discrete moves nothing: it keeps what leaves drawn until its exit is over.
+		if property == "none" || strings.HasSuffix(one, " allow-discrete") {
 			continue
 		}
 		if !paintOnly[property] {
@@ -205,6 +208,7 @@ func TestMotion_LargerMovesTakeLonger(t *testing.T) {
 	css := builtStylesheet(t)
 	state, enter, page, move := motionTime(t, css, "--t-state"), motionTime(t, css, "--t-enter"), motionTime(t, css, "--t-page"), motionTime(t, css, "--t-move")
 	assert.Less(t, state, enter)
+	assert.Less(t, motionTime(t, css, "--t-exit"), enter, "what leaves is out of the way sooner than it came")
 	assert.Less(t, enter, page)
 	assert.LessOrEqual(t, page, 500, "a page change is made all day")
 	assert.LessOrEqual(t, move, 700)
@@ -257,22 +261,93 @@ func TestMotion_APageChangeIsACrossFadeWithARise(t *testing.T) {
 	}
 }
 
-// TestMotion_ThingsComeInOnOneCurve: a card, a dialog, the search and the rows
-// of a list all arrive in the same time on the same curve, and a list's rows
-// follow each other 40 ms apart, to at most 200 ms.
+// TestMotion_ThingsComeInOnOneCurve: a card, a dialog, the search, the account
+// menu and the rows of a list all arrive in the same time on the same curve,
+// and a list's rows follow each other 40 ms apart, to at most 200 ms.
 func TestMotion_ThingsComeInOnOneCurve(t *testing.T) {
 	wanted, _ := whereMotionIsWanted(t, builtStylesheet(t))
+	const arrive = "transition:opacity var(--t-enter) var(--ease-enter), transform var(--t-enter) var(--ease-enter)"
 	for _, rule := range []string{
 		".rise>*{animation:rise-in var(--t-enter) var(--ease-enter) both}",
 		".float-in{animation:rise-in var(--t-enter) var(--ease-enter) both}",
-		"dialog.dialog[open],dialog.palette[open]{animation:rise-in var(--t-enter) var(--ease-enter) both}",
-		"dialog[open]::backdrop{animation:fade-in var(--t-enter) linear both}",
 		".rise>:nth-child(2){animation-delay:40ms}",
 		".rise>:nth-child(5){animation-delay:.16s}",
 		".rise>:nth-child(n+6){animation-delay:.2s}",
+		// What can also leave arrives by a transition, from the starting style.
+		"dialog.dialog[open],dialog.palette[open],.map-list,.map-detail{" + arrive + "}",
+		".account-menu:popover-open{" + arrive + "}",
+		"dialog[open]::backdrop{transition:opacity var(--t-enter) linear}",
+		"@starting-style{dialog.dialog[open],dialog.palette[open]{opacity:0;transform:translateY(12px)scale(.98)}dialog[open]::backdrop{opacity:0}" +
+			".account-menu:popover-open{opacity:0;transform:translateY(-8px)scale(.98)}.map-list,.map-detail{opacity:0;transform:translateY(12px)}}",
 	} {
 		assert.Contains(t, wanted, rule)
 	}
+}
+
+// TestMotion_WhatComesInGoesOut: a message, the vehicle list, the vehicle
+// card, a dialog, the search and the account menu fade out where they used to
+// vanish. Each is kept drawn while it leaves, and the three drawn over the
+// page only where the browser can keep them there.
+func TestMotion_WhatComesInGoesOut(t *testing.T) {
+	css := builtStylesheet(t)
+	wanted, always := whereMotionIsWanted(t, css)
+	for _, lingers := range []string{"allow-discrete", "--t-exit)", "@starting-style"} {
+		assert.NotContains(t, always, lingers, "nothing arrives or lingers for someone who asked for less motion")
+	}
+
+	const leave = "transition:opacity var(--t-exit) var(--ease-exit), transform var(--t-exit) var(--ease-exit)"
+	onTop := regexp.MustCompile(`@supports \(overlay:auto\)\{((?:[^{}]*\{[^{}]*\})*)\}`).FindStringSubmatch(wanted)
+	require.NotNil(t, onTop)
+	inPlace := strings.Replace(wanted, onTop[0], "", 1)
+
+	// Hidden with the hidden attribute, which the stylesheet's own [hidden] rule would otherwise end at once.
+	assert.Contains(t, inPlace, ".toast[hidden],.map-list[hidden],.map-detail[hidden]{"+leave+", display var(--t-exit) allow-discrete}")
+	assert.Contains(t, inPlace, ".toast[hidden]{opacity:0;transform:translate(-50%,8px)}", "a message keeps its place across the page as it sinks")
+	assert.Contains(t, inPlace, ".map-list[hidden],.map-detail[hidden]{opacity:0;pointer-events:none;transform:translateY(8px)}")
+	assert.NotContains(t, inPlace, "overlay")
+
+	// Drawn over the page: closed by the browser, and kept on top by the overlay property.
+	const onTopLeave = leave + ", overlay var(--t-exit) allow-discrete, display var(--t-exit) allow-discrete"
+	for _, rule := range []string{
+		"dialog.dialog:not([open]),dialog.palette:not([open]){" + onTopLeave + "}",
+		".account-menu:not(:popover-open){" + onTopLeave + "}",
+		"dialog.dialog:not([open]),dialog.palette:not([open]){opacity:0;transform:translateY(6px)scale(.98)}",
+		".account-menu:not(:popover-open){opacity:0;transform:translateY(-6px)scale(.98)}",
+		"dialog:not([open])::backdrop{opacity:0;transition:opacity var(--t-exit) linear, overlay var(--t-exit) allow-discrete, display var(--t-exit) allow-discrete}",
+	} {
+		assert.Contains(t, onTop[1], rule)
+	}
+
+	// The scripts hide these; taking one out of the page would leave nothing to fade.
+	shell, err := fs.ReadFile(files, "web/static/js/app.js")
+	require.NoError(t, err)
+	assert.Contains(t, string(shell), "var close = function () { t.hidden = true; };")
+	assert.NotContains(t, string(shell), "t.remove()")
+	live, err := fs.ReadFile(files, "web/static/js/map.js")
+	require.NoError(t, err)
+	assert.Contains(t, string(live), `if (!id || !markers[id]) { shell.hidden = true; card = null; return; }`)
+	assert.Contains(t, string(live), `function setList(open) { listOpen = open; $("map-list").hidden = !open; $("map-list-open").hidden = open; }`)
+}
+
+// TestMotion_NothingThatLeavesIsHeldByKeyframes: Chrome starts no transition
+// on a property that a keyframe animation has been holding. So anything that
+// fades out must come in by a transition too: with a keyframe entrance it
+// vanishes when closed, as it did before.
+func TestMotion_NothingThatLeavesIsHeldByKeyframes(t *testing.T) {
+	css := builtStylesheet(t)
+	leaves := regexp.MustCompile(`dialog|\.account-menu|\.toast|\.map-list|\.map-detail`)
+	for _, rule := range regexp.MustCompile(`([^{}]+)\{[^{}]*?animation:([^;}]*)`).FindAllStringSubmatch(css, -1) {
+		assert.False(t, leaves.MatchString(rule[1]), "%s plays the keyframes %s", rule[1], rule[2])
+	}
+
+	// float-in is a keyframe entrance, for what stays once it is there.
+	page, err := fs.ReadFile(files, "web/templates/views/map.html")
+	require.NoError(t, err)
+	assert.Contains(t, string(page), `<aside class="map-list float js-only" id="map-list"`)
+	assert.Contains(t, string(page), `<aside class="map-detail float" id="map-detail"`)
+	live, err := fs.ReadFile(files, "web/static/js/map.js")
+	require.NoError(t, err)
+	assert.NotContains(t, string(live), "float-in")
 }
 
 // TestMotion_OnlyWhereMotionIsWanted: someone who asked their computer for

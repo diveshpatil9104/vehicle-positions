@@ -146,7 +146,7 @@
 
   /* A message that confirms something leaves by itself. One that says something failed stays until closed. */
   $$("[data-toast]").forEach(function (t) {
-    var close = function () { t.remove(); };
+    var close = function () { t.hidden = true; };
     $("[data-toast-close]", t).addEventListener("click", close);
     if (!t.hasAttribute("data-toast-stay")) setTimeout(close, 6000);
   });
